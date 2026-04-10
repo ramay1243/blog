@@ -422,13 +422,44 @@
     padding-top: 1rem !important;
 }
 
-/* Адаптивность для видео */
-@media (max-width: 768px) {
-    .video-player-inline video {
-        max-height: 250px;
+    @media (max-width: 768px) {
+        .articles-grid { 
+            grid-template-columns: 1fr; 
+        }
+        .stats-bar { 
+            gap: 1.5rem; 
+        }
+        .card-header { 
+            padding: 1rem 1rem 0.5rem 1rem; 
+        }
+        .card-content { 
+            padding: 1rem; 
+        }
+        .article-title { 
+            font-size: 1.2rem; 
+        }
+        .left-menu {
+            display: none !important;
+        }
+        .categories-filter {
+            display: none;
+        }
+        .content-right {
+            width: 100%;
+        }
+        .section-header h2 {
+            font-size: 1.5rem;
+        }
+        .section-header p {
+            font-size: 0.85rem;
+        }
+        .video-player-inline video {
+            max-height: 200px;
+        }
+        .articles-grid {
+            gap: 1rem;
+        }
     }
-}
-
 </style>
 
 
