@@ -1013,18 +1013,21 @@ body.menu-open {
         <a href="/" class="mobile-menu-item">
             <i class="fas fa-home"></i> Главная
         </a>
-        <button class="mobile-menu-item" onclick="switchMobileFeed('fresh')">
+        
+        <div class="mobile-menu-divider"></div>
+        
+        <button class="mobile-menu-item" onclick="switchMobileFeed('fresh')" style="color: #aaa; background: none; border: none; width: 100%; cursor: pointer;">
             <i class="fas fa-clock"></i> Свежее
         </button>
-        <button class="mobile-menu-item" onclick="switchMobileFeed('popular')">
+        <button class="mobile-menu-item" onclick="switchMobileFeed('popular')" style="color: #aaa; background: none; border: none; width: 100%; cursor: pointer;">
             <i class="fas fa-fire"></i> Популярное
         </button>
         {% if user %}
-        <button class="mobile-menu-item" onclick="switchMobileFeed('myfeed')">
+        <button class="mobile-menu-item" onclick="switchMobileFeed('myfeed')" style="color: #aaa; background: none; border: none; width: 100%; cursor: pointer;">
             <i class="fas fa-rss"></i> Моя лента
         </button>
         {% endif %}
-        <button class="mobile-menu-item" onclick="switchMobileFeed('videos')">
+        <button class="mobile-menu-item" onclick="switchMobileFeed('videos')" style="color: #aaa; background: none; border: none; width: 100%; cursor: pointer;">
             <i class="fas fa-video"></i> Видео
         </button>
         
@@ -1042,18 +1045,6 @@ body.menu-open {
         
         {% if user %}
         <div class="mobile-menu-divider"></div>
-        <a href="/profile" class="mobile-menu-item">
-            <i class="fas fa-user"></i> Профиль
-        </a>
-        <a href="/settings" class="mobile-menu-item">
-            <i class="fas fa-cog"></i> Настройки
-        </a>
-        <a href="/my-subscriptions" class="mobile-menu-item">
-            <i class="fas fa-users"></i> Подписки
-        </a>
-        <a href="/my-bookmarks" class="mobile-menu-item">
-            <i class="fas fa-bookmark"></i> Закладки
-        </a>
         <a href="/logout" class="mobile-menu-item" style="color: #ef4444;">
             <i class="fas fa-sign-out-alt"></i> Выйти
         </a>
