@@ -919,11 +919,33 @@ body.menu-open {
     color: #ff8c00 !important;
     background: rgba(255, 140, 0, 0.1) !important;
 }
+.mobile-create-btn {
+    background: none;
+    border: none;
+    color: #e0e0e0;
+    font-size: 1.3rem;
+    cursor: pointer;
+    padding: 0.3rem 0.5rem;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    transition: all 0.2s;
+    border-radius: 40px;
+}
+
+.mobile-create-btn:hover {
+    background: #1a1a1a;
+    color: #ff8c00;
+}
     </style>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 </head>
 <body>
 
+<!-- ========== МОБИЛЬНАЯ ШАПКА ========== -->
 <!-- ========== МОБИЛЬНАЯ ШАПКА ========== -->
 <div class="mobile-header">
     <button class="burger-btn" onclick="openMobileMenu()">
@@ -932,6 +954,12 @@ body.menu-open {
     <a href="/" class="mobile-logo">StoryBlog</a>
     <div class="mobile-header-actions">
         {% if user %}
+        <!-- Кнопка Написать -->
+        <a href="/create" class="mobile-create-btn" title="Написать">
+            <i class="fas fa-plus"></i>
+        </a>
+        
+        <!-- Колокольчик уведомлений -->
         <div class="mobile-notif">
             <button class="mobile-notif-btn" onclick="toggleMobileNotifMenu()">
                 <i class="fas fa-bell"></i>
@@ -939,6 +967,7 @@ body.menu-open {
             </button>
         </div>
         
+        <!-- Аватар пользователя -->
         <div class="mobile-user-menu">
             <button class="mobile-user-btn" onclick="toggleMobileUserMenu()">
                 {% if user.avatar and user.avatar != 'default.png' %}
