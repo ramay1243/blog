@@ -487,33 +487,40 @@
         
         @media (max-width: 768px) {
             .hero { 
-                height: auto;
+                height: auto !important;
                 min-height: 200px;
                 max-height: 300px;
             }
             
+            .hero-slider,
+            .hero-slider-track,
             .hero-slide {
-                padding: 1.5rem 1rem;
+                height: auto !important;
+                min-height: 200px;
+            }
+            
+            .hero-slide {
+                padding: 1.5rem 1rem !important;
                 justify-content: center;
                 box-sizing: border-box;
                 word-wrap: break-word;
             }
             
             .hero-slide h1 { 
-                font-size: 1.2rem;
+                font-size: 1.2rem !important;
                 line-height: 1.3;
                 margin-bottom: 0.3rem;
                 word-break: break-word;
             }
             
             .hero-slide p {
-                font-size: 0.75rem;
+                font-size: 0.75rem !important;
                 max-width: 90%;
                 word-break: break-word;
             }
             
             .hero-slide-icon { 
-                font-size: 1.5rem;
+                font-size: 1.5rem !important;
                 margin-bottom: 0.3rem;
             }
             
@@ -523,35 +530,67 @@
             }
             
             .stat-number { 
-                font-size: 0.9rem;
+                font-size: 0.9rem !important;
             }
             
             .stat-label {
-                font-size: 0.6rem;
+                font-size: 0.6rem !important;
             }
             
             .hero-slide-bg {
                 object-fit: cover;
                 object-position: center;
             }
+                        /* Стили специально для дефолтных слайдов */
+            .default-slide {
+                padding: 1.5rem 1rem !important;
+                height: auto !important;
+                min-height: 200px;
+            }
+            
+            .default-slide h1 {
+                font-size: 1.2rem !important;
+                line-height: 1.3 !important;
+                margin-bottom: 0.5rem !important;
+            }
+            
+            .default-slide p {
+                font-size: 0.75rem !important;
+                max-width: 90% !important;
+            }
+            
+            .default-slide .hero-slide-icon {
+                font-size: 1.5rem !important;
+                margin-bottom: 0.3rem !important;
+            }
+            
+            .default-slide .stat-number {
+                font-size: 0.9rem !important;
+            }
+            
+            .default-slide .stat-label {
+                font-size: 0.6rem !important;
+            }
         }
         
         @media (max-width: 480px) {
-            .hero {
-                min-height: 180px;
+            .hero,
+            .hero-slider,
+            .hero-slider-track,
+            .hero-slide {
+                min-height: 180px !important;
             }
             
             .hero-slide h1 {
-                font-size: 1rem;
+                font-size: 1rem !important;
             }
             
             .hero-slide p {
-                font-size: 0.7rem;
-                max-width: 95%;
+                font-size: 0.7rem !important;
             }
             
             .hero-slide-icon {
-                font-size: 1.2rem;
+                font-size: 1.2rem !important;
             }
             
             .stats-bar {
@@ -559,11 +598,11 @@
             }
             
             .stat-number {
-                font-size: 0.8rem;
+                font-size: 0.8rem !important;
             }
             
             .stat-label {
-                font-size: 0.55rem;
+                font-size: 0.55rem !important;
             }
         }
 
@@ -1292,7 +1331,7 @@ body.menu-open {
                     </div>
                     {% endfor %}
                     
-                    <div class="hero-slide">
+                    <div class="hero-slide default-slide">
                         <div class="hero-slide-icon">✨</div>
                         <h1>Истории, которые вдохновляют</h1>
                         <p>Платформа для настоящих авторов. Делитесь мыслями, читайте истории других</p>
@@ -1311,17 +1350,17 @@ body.menu-open {
                             </div>
                         </div>
                     </div>
-                    <div class="hero-slide">
+                    <div class="hero-slide default-slide">
                         <div class="hero-slide-icon">✍️</div>
                         <h1>Найдите свой голос</h1>
                         <p>Каждая история уникальна. Делитесь своими мыслями и вдохновляйте других</p>
                     </div>
-                    <div class="hero-slide">
+                    <div class="hero-slide default-slide">
                         <div class="hero-slide-icon">🤝</div>
                         <h1>Сообщество авторов</h1>
                         <p>Читайте, комментируйте, находите единомышленников и растите вместе</p>
                     </div>
-                    <div class="hero-slide">
+                    <div class="hero-slide default-slide">
                         <div class="hero-slide-icon">🚀</div>
                         <h1>Растите с нами</h1>
                         <p>Ваши истории увидят тысячи читателей. Начните прямо сейчас</p>
