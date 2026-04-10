@@ -493,23 +493,26 @@
             }
             
             .hero-slider,
-            .hero-slider-track,
-            .hero-slide {
+            .hero-slider-track {
                 height: auto !important;
                 min-height: 200px;
             }
             
+            /* Сбрасываем стили для ВСЕХ слайдов */
             .hero-slide {
+                height: auto !important;
+                min-height: 200px;
                 padding: 1.5rem 1rem !important;
                 justify-content: center;
                 box-sizing: border-box;
                 word-wrap: break-word;
             }
             
+            /* Общие стили для текста */
             .hero-slide h1 { 
                 font-size: 1.2rem !important;
-                line-height: 1.3;
-                margin-bottom: 0.3rem;
+                line-height: 1.3 !important;
+                margin-bottom: 0.5rem !important;
                 word-break: break-word;
             }
             
@@ -536,6 +539,49 @@
             .stat-label {
                 font-size: 0.6rem !important;
             }
+            
+            .hero-slide-bg {
+                object-fit: cover;
+                object-position: center;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .hero,
+            .hero-slider,
+            .hero-slider-track,
+            .hero-slide {
+                min-height: 180px !important;
+            }
+            
+            .hero-slide {
+                padding: 1rem 0.8rem !important;
+            }
+            
+            .hero-slide h1 {
+                font-size: 1rem !important;
+            }
+            
+            .hero-slide p {
+                font-size: 0.7rem !important;
+            }
+            
+            .hero-slide-icon {
+                font-size: 1.2rem !important;
+            }
+            
+            .stats-bar {
+                gap: 0.5rem;
+            }
+            
+            .stat-number {
+                font-size: 0.8rem !important;
+            }
+            
+            .stat-label {
+                font-size: 0.55rem !important;
+            }
+        }
             
             .hero-slide-bg {
                 object-fit: cover;
