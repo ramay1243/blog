@@ -1016,20 +1016,20 @@ body.menu-open {
         
         <div class="mobile-menu-divider"></div>
         
-        <button class="mobile-menu-item" onclick="switchMobileFeed('fresh')" style="color: #aaa; background: none; border: none; width: 100%; cursor: pointer;">
-            <i class="fas fa-clock"></i> Свежее
-        </button>
-        <button class="mobile-menu-item" onclick="switchMobileFeed('popular')" style="color: #aaa; background: none; border: none; width: 100%; cursor: pointer;">
-            <i class="fas fa-fire"></i> Популярное
-        </button>
-        {% if user %}
-        <button class="mobile-menu-item" onclick="switchMobileFeed('myfeed')" style="color: #aaa; background: none; border: none; width: 100%; cursor: pointer;">
-            <i class="fas fa-rss"></i> Моя лента
-        </button>
-        {% endif %}
-        <button class="mobile-menu-item" onclick="switchMobileFeed('videos')" style="color: #aaa; background: none; border: none; width: 100%; cursor: pointer;">
-            <i class="fas fa-video"></i> Видео
-        </button>
+        <button class="mobile-menu-item" onclick="switchMobileFeed('fresh')">
+    <i class="fas fa-clock"></i> Свежее
+</button>
+<button class="mobile-menu-item" onclick="switchMobileFeed('popular')">
+    <i class="fas fa-fire"></i> Популярное
+</button>
+{% if user %}
+<button class="mobile-menu-item" onclick="switchMobileFeed('myfeed')">
+    <i class="fas fa-rss"></i> Моя лента
+</button>
+{% endif %}
+<button class="mobile-menu-item" onclick="switchMobileFeed('videos')">
+    <i class="fas fa-video"></i> Видео
+</button>
         
         <div class="mobile-menu-divider"></div>
         
