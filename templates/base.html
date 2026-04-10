@@ -931,6 +931,7 @@ body.menu-open {
     </button>
     <a href="/" class="mobile-logo">StoryBlog</a>
     <div class="mobile-header-actions">
+        {% if user %}
         <div class="mobile-notif">
             <button class="mobile-notif-btn" onclick="toggleMobileNotifMenu()">
                 <i class="fas fa-bell"></i>
@@ -938,7 +939,6 @@ body.menu-open {
             </button>
         </div>
         
-        {% if user %}
         <div class="mobile-user-menu">
             <button class="mobile-user-btn" onclick="toggleMobileUserMenu()">
                 {% if user.avatar and user.avatar != 'default.png' %}
