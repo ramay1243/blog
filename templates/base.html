@@ -581,76 +581,7 @@
             .stat-label {
                 font-size: 0.55rem !important;
             }
-        }
-            
-            .hero-slide-bg {
-                object-fit: cover;
-                object-position: center;
-            }
-                        /* Стили специально для дефолтных слайдов */
-            .default-slide {
-                padding: 1.5rem 1rem !important;
-                height: auto !important;
-                min-height: 200px;
-            }
-            
-            .default-slide h1 {
-                font-size: 1.2rem !important;
-                line-height: 1.3 !important;
-                margin-bottom: 0.5rem !important;
-            }
-            
-            .default-slide p {
-                font-size: 0.75rem !important;
-                max-width: 90% !important;
-            }
-            
-            .default-slide .hero-slide-icon {
-                font-size: 1.5rem !important;
-                margin-bottom: 0.3rem !important;
-            }
-            
-            .default-slide .stat-number {
-                font-size: 0.9rem !important;
-            }
-            
-            .default-slide .stat-label {
-                font-size: 0.6rem !important;
-            }
-        }
-        
-        @media (max-width: 480px) {
-            .hero,
-            .hero-slider,
-            .hero-slider-track,
-            .hero-slide {
-                min-height: 180px !important;
-            }
-            
-            .hero-slide h1 {
-                font-size: 1rem !important;
-            }
-            
-            .hero-slide p {
-                font-size: 0.7rem !important;
-            }
-            
-            .hero-slide-icon {
-                font-size: 1.2rem !important;
-            }
-            
-            .stats-bar {
-                gap: 0.5rem;
-            }
-            
-            .stat-number {
-                font-size: 0.8rem !important;
-            }
-            
-            .stat-label {
-                font-size: 0.55rem !important;
-            }
-        }
+        }        
 
         /* ========== МОБИЛЬНОЕ БУРГЕР-МЕНЮ ========== */
 .mobile-header {
@@ -1416,52 +1347,54 @@ body.menu-open {
         </div>
 
         <script>
-            function initHeroSlider() {
-                const track = document.getElementById('heroSliderTrack');
-                if (!track) return;
+function initHeroSlider() {
+    const track = document.getElementById('heroSliderTrack');
+    if (!track) return;
+    
+    const slides = Array.from(track.children);
+    if (slides.length <= 1) return;
+    
+    let currentIndex = 0;
+    let interval;
+    
+    function goToSlide(index) {
+        const slideWidth = slides[0].offsetWidth;
+        track.style.transition = 'transform 0.5s ease-in-out';
+        track.style.transform = `translateX(-${index * slideWidth}px)`;
+        currentIndex = index;
+    }
+    
+    function nextSlide() {
+        if (currentIndex === slides.length - 1) {
+            // Если последний слайд - возвращаемся к первому
+            currentIndex = 0;
+        } else {
+            currentIndex++;
+        }
+        goToSlide(currentIndex);
+    }
+    
+    // Запускаем автопрокрутку
+    interval = setInterval(nextSlide, 4000);
+    
+    // При ресайзе пересчитываем позицию
+    window.addEventListener('resize', () => {
+        track.style.transition = 'none';
+        goToSlide(currentIndex);
+        setTimeout(() => {
+            track.style.transition = 'transform 0.5s ease-in-out';
+        }, 50);
+    });
+    
+    // Останавливаем при наведении
+    track.addEventListener('mouseenter', () => clearInterval(interval));
+    track.addEventListener('mouseleave', () => {
+        clearInterval(interval);
+        interval = setInterval(nextSlide, 4000);
+    });
+}
                 
-                let slides = Array.from(track.children);
-                if (slides.length <= 1) return;
-                
-                const firstClone = slides[0].cloneNode(true);
-                track.appendChild(firstClone);
-                slides = Array.from(track.children);
-                
-                let slideIndex = 0;
-                let isTransitioning = false;
-                
-                function showSlide(index) {
-                    if (isTransitioning) return;
-                    isTransitioning = true;
-                    const slideWidth = slides[0].offsetWidth;
-                    track.style.transform = `translateX(-${index * slideWidth}px)`;
-                    track.style.transition = 'transform 0.5s ease-in-out';
-                    setTimeout(() => { isTransitioning = false; }, 500);
-                }
-                
-                function nextSlide() {
-                    if (isTransitioning) return;
-                    slideIndex++;
-                    showSlide(slideIndex);
-                    if (slideIndex === slides.length - 1) {
-                        setTimeout(() => {
-                            track.style.transition = 'none';
-                            slideIndex = 0;
-                            showSlide(slideIndex);
-                            setTimeout(() => { track.style.transition = 'transform 0.5s ease-in-out'; }, 50);
-                        }, 500);
-                    }
-                }
-                
-                setInterval(nextSlide, 4000);
-                window.addEventListener('resize', () => {
-                    track.style.transition = 'none';
-                    showSlide(slideIndex);
-                    setTimeout(() => { track.style.transition = 'transform 0.5s ease-in-out'; }, 50);
-                });
-            }
-            
-            function loadHeroStats() {
+                        function loadHeroStats() {
                 fetch('/api/stats')
                     .then(response => response.json())
                     .then(data => {
