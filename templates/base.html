@@ -901,6 +901,24 @@ body.menu-open {
 .mobile-notif-overlay.show {
     display: block;
 }
+/* Исправление цвета для кнопок в мобильном меню */
+.mobile-menu-items button.mobile-menu-item,
+.mobile-menu-items .mobile-menu-item[onclick] {
+    color: #aaa !important;
+    background: transparent !important;
+    border: none !important;
+    font-family: inherit !important;
+    font-size: 1.1rem !important;
+    font-weight: 400 !important;
+    text-align: left !important;
+    width: 100% !important;
+}
+
+.mobile-menu-items button.mobile-menu-item:hover,
+.mobile-menu-items .mobile-menu-item[onclick]:hover {
+    color: #ff8c00 !important;
+    background: rgba(255, 140, 0, 0.1) !important;
+}
     </style>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 </head>
