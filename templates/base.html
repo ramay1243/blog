@@ -492,10 +492,364 @@
             .stats-bar { gap: 1rem; }
             .stat-number { font-size: 1rem; }
         }
+
+        /* ========== МОБИЛЬНОЕ БУРГЕР-МЕНЮ ========== */
+.mobile-header {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    background: #000;
+    border-bottom: 2px solid #ff8c00;
+    padding: 0.8rem 1.2rem;
+    z-index: 1000;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.burger-btn {
+    background: none;
+    border: none;
+    color: #ff8c00;
+    font-size: 1.8rem;
+    cursor: pointer;
+    padding: 0.3rem 0.5rem;
+    transition: all 0.2s;
+    width: 44px;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.burger-btn:hover {
+    color: #ffa233;
+}
+
+.mobile-logo {
+    color: #ff8c00;
+    text-decoration: none;
+    font-size: 1.3rem;
+    font-weight: bold;
+}
+
+.mobile-notif {
+    position: relative;
+}
+
+.mobile-notif-btn {
+    background: none;
+    border: none;
+    color: #e0e0e0;
+    font-size: 1.4rem;
+    cursor: pointer;
+    padding: 0.3rem 0.5rem;
+    width: 44px;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.mobile-menu {
+    position: fixed;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100vh;
+    background: #0d0d0d;
+    z-index: 2000;
+    transition: left 0.3s ease;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+}
+
+.mobile-menu.open {
+    left: 0;
+}
+
+.mobile-menu-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem 1.5rem;
+    border-bottom: 1px solid rgba(255, 140, 0, 0.2);
+}
+
+.mobile-menu-close {
+    background: none;
+    border: none;
+    color: #ff8c00;
+    font-size: 1.8rem;
+    cursor: pointer;
+    padding: 0.5rem;
+    width: 50px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.mobile-auth-btn {
+    background: #ff8c00;
+    color: #000;
+    padding: 0.5rem 1.2rem;
+    border-radius: 30px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.9rem;
+    transition: all 0.2s;
+}
+
+.mobile-auth-btn:hover {
+    background: #ffa233;
+}
+
+.mobile-user-info {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1.5rem;
+    border-bottom: 1px solid rgba(255, 140, 0, 0.15);
+}
+
+.mobile-user-avatar {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.mobile-user-avatar-placeholder {
+    width: 60px;
+    height: 60px;
+    background: #ff8c00;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #000;
+    font-weight: bold;
+    font-size: 1.5rem;
+}
+
+.mobile-user-name {
+    color: #fff;
+    font-size: 1.1rem;
+    font-weight: 600;
+}
+
+.mobile-user-email {
+    color: #666;
+    font-size: 0.8rem;
+}
+
+.mobile-menu-items {
+    flex: 1;
+    padding: 1rem 0;
+}
+
+.mobile-menu-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem 1.5rem;
+    color: #aaa;
+    text-decoration: none;
+    font-size: 1.1rem;
+    transition: all 0.2s;
+    border-left: 3px solid transparent;
+}
+
+.mobile-menu-item:hover {
+    background: rgba(255, 140, 0, 0.1);
+    color: #ff8c00;
+}
+
+.mobile-menu-item.active {
+    background: rgba(255, 140, 0, 0.15);
+    color: #ff8c00;
+    border-left-color: #ff8c00;
+}
+
+.mobile-menu-divider {
+    height: 1px;
+    background: rgba(255, 140, 0, 0.15);
+    margin: 0.5rem 0;
+}
+
+.mobile-menu-footer {
+    padding: 1.5rem;
+    text-align: center;
+    color: #444;
+    font-size: 0.75rem;
+    border-top: 1px solid rgba(255, 140, 0, 0.15);
+}
+
+.mobile-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    z-index: 1500;
+    display: none;
+}
+
+.mobile-overlay.show {
+    display: block;
+}
+
+/* Адаптация существующих стилей */
+@media (max-width: 992px) {
+    body {
+        padding-right: 0;
+    }
+    
+    .navbar {
+        display: none !important;
+    }
+    
+    .mobile-header {
+        display: flex;
+    }
+    
+    .container {
+        margin-left: auto;
+        margin-right: auto;
+        padding: 0 1rem;
+        margin-top: 70px;
+    }
+    
+    .hero {
+        margin-left: 0;
+        margin-right: 0;
+        border-radius: 16px;
+    }
+}
+
+@media (min-width: 993px) {
+    .mobile-menu, .mobile-overlay, .mobile-header {
+        display: none !important;
+    }
+}
+
+/* Блокировка скролла при открытом меню */
+body.menu-open {
+    overflow: hidden;
+}
     </style>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 </head>
 <body>
+
+<!-- ========== МОБИЛЬНАЯ ШАПКА ========== -->
+<div class="mobile-header">
+    <button class="burger-btn" onclick="openMobileMenu()">
+        <i class="fas fa-bars"></i>
+    </button>
+    <a href="/" class="mobile-logo">StoryBlog</a>
+    <div class="mobile-notif">
+        <button class="mobile-notif-btn" onclick="window.location.href='/notifications'">
+            <i class="fas fa-bell"></i>
+            <span id="mobileNotifBadge" class="notif-badge" style="display: none;"></span>
+        </button>
+    </div>
+</div>
+
+<!-- ========== ВЫЕЗЖАЮЩЕЕ МЕНЮ ========== -->
+<div class="mobile-overlay" id="mobileOverlay" onclick="closeMobileMenu()"></div>
+
+<div class="mobile-menu" id="mobileMenu">
+    <div class="mobile-menu-header">
+        <button class="mobile-menu-close" onclick="closeMobileMenu()">
+            <i class="fas fa-times"></i>
+        </button>
+        {% if not user %}
+        <a href="/login" class="mobile-auth-btn">
+            <i class="fas fa-sign-in-alt"></i> Войти / Регистрация
+        </a>
+        {% endif %}
+    </div>
+    
+    {% if user %}
+    <div class="mobile-user-info">
+        {% if user.avatar and user.avatar != 'default.png' %}
+        <img src="/static/avatars/{{ user.avatar }}" class="mobile-user-avatar">
+        {% else %}
+        <div class="mobile-user-avatar-placeholder">{{ user.username[0]|upper }}</div>
+        {% endif %}
+        <div>
+            <div class="mobile-user-name">{{ user.username }}</div>
+            <div class="mobile-user-email">{{ user.email }}</div>
+        </div>
+    </div>
+    {% endif %}
+    
+    <div class="mobile-menu-items">
+        <a href="/" class="mobile-menu-item">
+            <i class="fas fa-home"></i> Главная
+        </a>
+        <button class="mobile-menu-item" onclick="switchMobileFeed('fresh')">
+            <i class="fas fa-clock"></i> Свежее
+        </button>
+        <button class="mobile-menu-item" onclick="switchMobileFeed('popular')">
+            <i class="fas fa-fire"></i> Популярное
+        </button>
+        {% if user %}
+        <button class="mobile-menu-item" onclick="switchMobileFeed('myfeed')">
+            <i class="fas fa-rss"></i> Моя лента
+        </button>
+        {% endif %}
+        <button class="mobile-menu-item" onclick="switchMobileFeed('videos')">
+            <i class="fas fa-video"></i> Видео
+        </button>
+        
+        <div class="mobile-menu-divider"></div>
+        
+        <a href="/about" class="mobile-menu-item">
+            <i class="fas fa-info-circle"></i> О сайте
+        </a>
+        <a href="/contacts" class="mobile-menu-item">
+            <i class="fas fa-envelope"></i> Контакты
+        </a>
+        <a href="/privacy" class="mobile-menu-item">
+            <i class="fas fa-lock"></i> Политика
+        </a>
+        
+        {% if user %}
+        <div class="mobile-menu-divider"></div>
+        <a href="/profile" class="mobile-menu-item">
+            <i class="fas fa-user"></i> Профиль
+        </a>
+        <a href="/settings" class="mobile-menu-item">
+            <i class="fas fa-cog"></i> Настройки
+        </a>
+        <a href="/my-subscriptions" class="mobile-menu-item">
+            <i class="fas fa-users"></i> Подписки
+        </a>
+        <a href="/my-bookmarks" class="mobile-menu-item">
+            <i class="fas fa-bookmark"></i> Закладки
+        </a>
+        <a href="/logout" class="mobile-menu-item" style="color: #ef4444;">
+            <i class="fas fa-sign-out-alt"></i> Выйти
+        </a>
+        {% if user.is_admin %}
+        <a href="/admin" class="mobile-menu-item">
+            <i class="fas fa-shield-alt"></i> Админ-панель
+        </a>
+        {% endif %}
+        {% endif %}
+    </div>
+    
+    <div class="mobile-menu-footer">
+        <i class="fas fa-copyright"></i> 2026 StoryBlog
+    </div>
+</div>
+
     <nav class="navbar">
         <h2><a href="/" style="color:#ff8c00; text-decoration:none;">StoryBlog</a></h2>
         <div class="nav-links">
@@ -818,5 +1172,105 @@
             setInterval(updateNotificationCount, 5000);
         });
     </script>
+
+<script>
+    // ========== МОБИЛЬНОЕ МЕНЮ ==========
+    function openMobileMenu() {
+        document.getElementById('mobileMenu').classList.add('open');
+        document.getElementById('mobileOverlay').classList.add('show');
+        document.body.classList.add('menu-open');
+    }
+    
+    function closeMobileMenu() {
+        document.getElementById('mobileMenu').classList.remove('open');
+        document.getElementById('mobileOverlay').classList.remove('show');
+        document.body.classList.remove('menu-open');
+    }
+    
+    function switchMobileFeed(feedType) {
+        closeMobileMenu();
+        
+        // Переключаем ленту на главной странице
+        if (window.location.pathname === '/') {
+            const feedBtn = document.querySelector(`.left-menu-item[data-feed="${feedType}"]`);
+            if (feedBtn) {
+                feedBtn.click();
+            } else if (feedType === 'videos') {
+                window.location.href = '/videos';
+            }
+        } else {
+            // Если не на главной - переходим
+            if (feedType === 'videos') {
+                window.location.href = '/videos';
+            } else {
+                window.location.href = '/';
+                sessionStorage.setItem('pendingFeed', feedType);
+            }
+        }
+    }
+    
+    // При загрузке главной проверяем отложенную ленту
+    if (window.location.pathname === '/') {
+        const pendingFeed = sessionStorage.getItem('pendingFeed');
+        if (pendingFeed) {
+            sessionStorage.removeItem('pendingFeed');
+            setTimeout(() => {
+                const feedBtn = document.querySelector(`.left-menu-item[data-feed="${pendingFeed}"]`);
+                if (feedBtn) feedBtn.click();
+            }, 100);
+        }
+    }
+    
+    // Свайпы для мобильного меню
+    let touchStartX = 0;
+    let touchEndX = 0;
+    
+    document.addEventListener('touchstart', (e) => {
+        touchStartX = e.changedTouches[0].screenX;
+    });
+    
+    document.addEventListener('touchend', (e) => {
+        touchEndX = e.changedTouches[0].screenX;
+        handleSwipe();
+    });
+    
+    function handleSwipe() {
+        const menu = document.getElementById('mobileMenu');
+        const isOpen = menu.classList.contains('open');
+        
+        // Свайп вправо - открыть меню
+        if (touchEndX - touchStartX > 70 && !isOpen) {
+            openMobileMenu();
+        }
+        
+        // Свайп влево - закрыть меню
+        if (touchStartX - touchEndX > 70 && isOpen) {
+            closeMobileMenu();
+        }
+    }
+    
+    // Обновление мобильного бейджа уведомлений
+    function updateMobileNotifBadge() {
+        fetch('/api/notifications/count')
+            .then(res => res.json())
+            .then(data => {
+                const badge = document.getElementById('mobileNotifBadge');
+                if (badge) {
+                    if (data.count > 0) {
+                        badge.style.display = 'inline-block';
+                        badge.textContent = data.count > 99 ? '99+' : data.count;
+                    } else {
+                        badge.style.display = 'none';
+                    }
+                }
+            });
+    }
+    
+    document.addEventListener('DOMContentLoaded', () => {
+        updateMobileNotifBadge();
+        setInterval(updateMobileNotifBadge, 5000);
+    });
+</script>
+
 </body>
 </html>
