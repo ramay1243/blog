@@ -1,0 +1,226 @@
+{% extends "base.html" %}
+
+{% block content %}
+<style>
+    .notifications-container {
+        max-width: 800px;
+        margin: 0;
+    }
+    
+    .notifications-header {
+        margin-bottom: 2rem;
+        border-left: 3px solid #ff8c00;
+        padding-left: 1rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+    
+    .notifications-header h2 {
+        font-size: 1.8rem;
+        color: #fff;
+        margin: 0;
+    }
+    
+    .mark-all-btn {
+        background: #1a1a1a;
+        border: 1px solid #333;
+        color: #aaa;
+        padding: 0.4rem 1rem;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+    
+    .mark-all-btn:hover {
+        background: #ff8c00;
+        color: #000;
+        border-color: #ff8c00;
+    }
+    
+    .notifications-list {
+        display: flex;
+        flex-direction: column;
+        gap: 0.8rem;
+    }
+    
+    .notification-item {
+        background: #0d0d0d;
+        border-radius: 16px;
+        padding: 1rem;
+        border: 1px solid rgba(255, 140, 0, 0.15);
+        transition: all 0.2s;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        text-decoration: none;
+        cursor: pointer;
+    }
+    
+    .notification-item:hover {
+        transform: translateX(5px);
+        border-color: rgba(255, 140, 0, 0.4);
+    }
+    
+    .notification-item.unread {
+        background: #1a0a00;
+        border-left: 3px solid #ff8c00;
+    }
+    
+    .notification-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.2rem;
+        flex-shrink: 0;
+    }
+    
+    .notification-icon.comment {
+        background: rgba(59, 130, 246, 0.15);
+        color: #3b82f6;
+    }
+    
+    .notification-icon.like {
+        background: rgba(239, 68, 68, 0.15);
+        color: #ef4444;
+    }
+    
+    .notification-icon.subscribe {
+        background: rgba(16, 185, 129, 0.15);
+        color: #10b981;
+    }
+    
+    .notification-icon.default {
+        background: rgba(255, 140, 0, 0.15);
+        color: #ff8c00;
+    }
+    
+    .notification-content {
+        flex: 1;
+    }
+    
+    .notification-message {
+        font-size: 0.85rem;
+        color: #ddd;
+        margin-bottom: 0.25rem;
+        line-height: 1.4;
+    }
+    
+    .notification-time {
+        font-size: 0.65rem;
+        color: #666;
+        display: flex;
+        align-items: center;
+        gap: 0.3rem;
+    }
+    
+    .notification-read {
+        color: #666;
+        font-size: 1rem;
+        cursor: pointer;
+        padding: 0.3rem;
+        transition: color 0.2s;
+    }
+    
+    .notification-read:hover {
+        color: #ff8c00;
+    }
+    
+    .empty-notifications {
+        text-align: center;
+        padding: 4rem;
+        background: #0d0d0d;
+        border-radius: 24px;
+        border: 1px dashed #ff8c00;
+    }
+    
+    .empty-notifications-icon {
+        font-size: 4rem;
+        margin-bottom: 1rem;
+        color: #666;
+    }
+    
+    @media (max-width: 768px) {
+        .notifications-header {
+            flex-direction: column;
+            text-align: center;
+        }
+        .notification-item {
+            flex-direction: column;
+            text-align: center;
+        }
+        .notification-icon {
+            margin: 0 auto;
+        }
+    }
+</style>
+
+<div class="notifications-container">
+    <div class="notifications-header">
+        <h2><i class="fas fa-bell"></i> Уведомления</h2>
+        <form method="post" action="/notifications/mark-all-read">
+            <button type="submit" class="mark-all-btn">
+                <i class="fas fa-check-double"></i> Отметить все
+            </button>
+        </form>
+    </div>
+    
+    <div class="notifications-list">
+        {% if notifications %}
+            {% for notif in notifications %}
+            <div class="notification-item {% if not notif.is_read %}unread{% endif %}" 
+                 onclick="markAndRedirect({{ notif.id }}, '{{ notif.link }}')">
+                <div class="notification-icon {{ notif.icon_class }}">
+                    {% if notif.type == 'comment' %}
+                        <i class="fas fa-comment"></i>
+                    {% elif notif.type == 'like' %}
+                        <i class="fas fa-heart"></i>
+                    {% elif notif.type == 'subscribe' %}
+                        <i class="fas fa-user-plus"></i>
+                    {% else %}
+                        <i class="fas fa-bell"></i>
+                    {% endif %}
+                </div>
+                <div class="notification-content">
+                    <div class="notification-message">{{ notif.message }}</div>
+                    <div class="notification-time">
+                        <i class="fas fa-clock"></i> {{ notif.time_ago }}
+                    </div>
+                </div>
+                {% if not notif.is_read %}
+                <div class="notification-read">
+                    <i class="fas fa-circle" style="font-size: 0.6rem; color: #ff8c00;"></i>
+                </div>
+                {% endif %}
+            </div>
+            {% endfor %}
+        {% else %}
+            <div class="empty-notifications">
+                <div class="empty-notifications-icon">
+                    <i class="fas fa-bell-slash"></i>
+                </div>
+                <h3>Нет уведомлений</h3>
+                <p style="color: #888;">Когда кто-то прокомментирует или лайкнет вашу статью, уведомления появятся здесь</p>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<script>
+    function markAndRedirect(notifId, link) {
+        fetch(`/api/notifications/read/${notifId}`, { method: 'POST' })
+            .then(() => {
+                window.location.href = link;
+            })
+            .catch(() => {
+                window.location.href = link;
+            });
+    }
+</script>
+{% endblock %}

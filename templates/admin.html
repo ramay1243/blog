@@ -1,0 +1,786 @@
+{% extends "base.html" %}
+
+{% block content %}
+<style>
+    .admin-container {
+        width: 100%;
+        margin: 0;
+    }
+    
+    .admin-header {
+        margin-bottom: 2rem;
+        border-left: 3px solid #ff8c00;
+        padding-left: 1rem;
+    }
+    
+    .admin-header h2 {
+        font-size: 2rem;
+        color: #fff;
+    }
+    
+    .admin-header p {
+        color: #888;
+        margin-top: 0.3rem;
+    }
+    
+    /* Статистические карточки */
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+    }
+    
+    .stat-card {
+        background: linear-gradient(135deg, #0d0d0d 0%, #0a0a0a 100%);
+        border-radius: 20px;
+        padding: 1.5rem;
+        border: 1px solid rgba(255, 140, 0, 0.15);
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .stat-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 3px;
+        background: linear-gradient(90deg, #ff8c00, #ff6600);
+        transform: scaleX(0);
+        transition: transform 0.3s ease;
+    }
+    
+    .stat-card:hover::before {
+        transform: scaleX(1);
+    }
+    
+    .stat-card:hover {
+        transform: translateY(-3px);
+        border-color: rgba(255, 140, 0, 0.3);
+    }
+    
+    .stat-icon {
+        font-size: 2rem;
+        color: #ff8c00;
+        margin-bottom: 0.5rem;
+    }
+    
+    .stat-number {
+        font-size: 2.5rem;
+        font-weight: bold;
+        color: #fff;
+    }
+    
+    .stat-label {
+        color: #888;
+        font-size: 0.85rem;
+        margin-top: 0.3rem;
+    }
+    
+    .stat-change {
+        font-size: 0.7rem;
+        margin-top: 0.5rem;
+        color: #10b981;
+    }
+    
+    /* Вкладки */
+    .admin-tabs {
+        display: flex;
+        gap: 0.5rem;
+        margin-bottom: 2rem;
+        border-bottom: 1px solid rgba(255, 140, 0, 0.2);
+        padding-bottom: 0.5rem;
+        flex-wrap: wrap;
+    }
+    
+    .admin-tab {
+        background: none;
+        border: none;
+        padding: 0.75rem 1.5rem;
+        color: #888;
+        font-size: 0.95rem;
+        cursor: pointer;
+        transition: all 0.2s;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .admin-tab:hover {
+        color: #ff8c00;
+        background: rgba(255, 140, 0, 0.1);
+    }
+    
+    .admin-tab.active {
+        color: #ff8c00;
+        background: rgba(255, 140, 0, 0.15);
+    }
+    
+    /* Таблицы */
+    .admin-card {
+        background: #0d0d0d;
+        border-radius: 20px;
+        border: 1px solid rgba(255, 140, 0, 0.15);
+        overflow: hidden;
+    }
+    
+    .admin-card-header {
+        padding: 1rem 1.5rem;
+        background: linear-gradient(135deg, #1a0a00 0%, #0d0d0d 100%);
+        border-bottom: 1px solid rgba(255, 140, 0, 0.2);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+    
+    .admin-card-header h3 {
+        color: #fff;
+        font-size: 1.2rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .search-box {
+        display: flex;
+        gap: 0.5rem;
+    }
+    
+    .search-box input {
+        padding: 0.5rem 1rem;
+        background: #1a1a1a;
+        border: 1px solid #333;
+        border-radius: 10px;
+        color: #fff;
+        min-width: 250px;
+    }
+    
+    .search-box input:focus {
+        outline: none;
+        border-color: #ff8c00;
+    }
+    
+    .admin-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+    
+    .admin-table th,
+    .admin-table td {
+        padding: 1rem;
+        text-align: left;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+    
+    .admin-table th {
+        color: #ff8c00;
+        font-weight: 600;
+        font-size: 0.85rem;
+    }
+    
+    .admin-table tr:hover {
+        background: rgba(255, 140, 0, 0.03);
+    }
+    
+    .btn-sm {
+        padding: 0.3rem 0.8rem;
+        font-size: 0.7rem;
+        border-radius: 8px;
+        margin: 0 0.2rem;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+    
+    .btn-sm:hover {
+        transform: translateY(-1px);
+    }
+    
+    .badge {
+        display: inline-block;
+        padding: 0.2rem 0.6rem;
+        border-radius: 20px;
+        font-size: 0.7rem;
+        font-weight: 500;
+    }
+    
+    .badge-admin {
+        background: rgba(255, 140, 0, 0.2);
+        color: #ff8c00;
+    }
+    
+    .badge-user {
+        background: rgba(16, 185, 129, 0.15);
+        color: #10b981;
+    }
+    
+    .badge-published {
+        background: rgba(16, 185, 129, 0.15);
+        color: #10b981;
+    }
+    
+    .badge-draft {
+        background: rgba(245, 158, 11, 0.15);
+        color: #f59e0b;
+    }
+    
+    .badge-pending {
+        background: rgba(239, 68, 68, 0.15);
+        color: #ef4444;
+    }
+    
+    /* Последние активности */
+    .activity-list {
+        padding: 0.5rem;
+    }
+    
+    .activity-item {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        padding: 0.8rem 1rem;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        transition: all 0.2s;
+    }
+    
+    .activity-item:hover {
+        background: rgba(255, 140, 0, 0.03);
+    }
+    
+    .activity-icon {
+        width: 35px;
+        height: 35px;
+        background: rgba(255, 140, 0, 0.1);
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1rem;
+    }
+    
+    .activity-content {
+        flex: 1;
+    }
+    
+    .activity-title {
+        color: #fff;
+        font-size: 0.9rem;
+    }
+    
+    .activity-time {
+        color: #666;
+        font-size: 0.7rem;
+    }
+    
+    /* Адаптив */
+    @media (max-width: 1024px) {
+        .stats-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+    
+    @media (max-width: 768px) {
+        .stats-grid {
+            grid-template-columns: 1fr;
+        }
+        .admin-tab {
+            padding: 0.5rem 1rem;
+            font-size: 0.85rem;
+        }
+        .admin-table {
+            display: block;
+            overflow-x: auto;
+        }
+        .admin-card-header {
+            flex-direction: column;
+            align-items: stretch;
+        }
+    }
+
+</style>
+
+<div class="admin-container">
+    <div class="admin-header">
+        <h2><i class="fas fa-shield-alt"></i> Админ-панель</h2>
+        <p>Управление сайтом, пользователями и контентом</p>
+    </div>
+    
+    <!-- Вкладки -->
+    <div class="admin-tabs">
+        <button class="admin-tab active" onclick="switchAdminTab('dashboard')">
+            <i class="fas fa-chart-line"></i> Обзор
+        </button>
+        <button class="admin-tab" onclick="switchAdminTab('articles')">
+            <i class="fas fa-newspaper"></i> Статьи
+        </button>
+        <button class="admin-tab" onclick="switchAdminTab('users')">
+            <i class="fas fa-users"></i> Пользователи
+        </button>
+        <button class="admin-tab" onclick="switchAdminTab('comments')">
+            <i class="fas fa-comments"></i> Комментарии
+        </button>
+        <button class="admin-tab" onclick="switchAdminTab('categories')">
+            <i class="fas fa-tags"></i> Категории
+        </button>
+        <button class="admin-tab" onclick="switchAdminTab('complaints')">   <!-- ← НОВАЯ КНОПКА -->
+            <i class="fas fa-flag"></i> Жалобы
+        </button>
+        <button class="admin-tab" onclick="switchAdminTab('slider')">
+            <i class="fas fa-images"></i> Слайдер
+        </button>
+    </div>
+    
+    <!-- Вкладка: Обзор -->
+    <div id="dashboard-tab" class="admin-tab-content">
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon"><i class="fas fa-newspaper"></i></div>
+                <div class="stat-number">{{ all_articles|length }}</div>
+                <div class="stat-label">Всего статей</div>
+                <div class="stat-change"><i class="fas fa-plus-circle"></i> +{{ all_articles|length }} всего</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon"><i class="fas fa-users"></i></div>
+                <div class="stat-number">{{ all_users|length }}</div>
+                <div class="stat-label">Пользователей</div>
+                <div class="stat-change"><i class="fas fa-user-plus"></i> активных</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon"><i class="fas fa-comments"></i></div>
+                <div class="stat-number">{{ all_comments|length }}</div>
+                <div class="stat-label">Комментариев</div>
+                <div class="stat-change"><i class="fas fa-chat"></i> обсуждений</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon"><i class="fas fa-clock"></i></div>
+                <div class="stat-number">{{ pending_articles|length }}</div>
+                <div class="stat-label">На модерации</div>
+                <div class="stat-change"><i class="fas fa-hourglass-half"></i> ожидают</div>
+            </div>
+        </div>
+        
+        <div class="stats-grid" style="margin-top: 0;">
+            <div class="stat-card">
+                <div class="stat-icon"><i class="fas fa-eye"></i></div>
+                <div class="stat-number">
+                    {% set total_views = namespace(value=0) %}
+                    {% for a in all_articles %}{% set total_views.value = total_views.value + a.views %}{% endfor %}
+                    {{ total_views.value }}
+                </div>
+                <div class="stat-label">Всего просмотров</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon"><i class="fas fa-heart"></i></div>
+                <div class="stat-number">
+                    {% set total_likes = namespace(value=0) %}
+                    {% for a in all_articles %}{% set total_likes.value = total_likes.value + a.likes %}{% endfor %}
+                    {{ total_likes.value }}
+                </div>
+                <div class="stat-label">Всего лайков</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon"><i class="fas fa-bookmark"></i></div>
+                <div class="stat-number">
+                    {% set total_categories = categories|length %}
+                    {{ total_categories }}
+                </div>
+                <div class="stat-label">Категорий</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon"><i class="fas fa-chart-simple"></i></div>
+                <div class="stat-number">
+                    {% set avg_views = (total_views.value / all_articles|length)|round|int if all_articles|length > 0 else 0 %}
+                    {{ avg_views }}
+                </div>
+                <div class="stat-label">Среднее просмотров</div>
+            </div>
+        </div>
+        
+        <!-- Последние статьи -->
+        <div class="admin-card">
+            <div class="admin-card-header">
+                <h3><i class="fas fa-clock"></i> Последние статьи</h3>
+                <a href="/admin?tab=articles" class="btn-sm btn-outline" style="text-decoration: none;">Все статьи →</a>
+            </div>
+            <div class="activity-list">
+                {% for article in all_articles[:5] %}
+                <div class="activity-item">
+                    <div class="activity-icon">
+                        <i class="fas fa-file-alt"></i>
+                    </div>
+                    <div class="activity-content">
+                        <div class="activity-title">
+                            <a href="/article/{{ article.slug }}" style="color: #fff;">{{ article.title }}</a>
+                            <span class="badge {% if article.is_published %}badge-published{% else %}badge-draft{% endif %}" style="margin-left: 0.5rem;">
+                                {% if article.is_published %}Опубликовано{% else %}Черновик{% endif %}
+                            </span>
+                        </div>
+                        <div class="activity-time">
+                            <i class="fas fa-eye"></i> {{ article.views }} просмотров
+                            <i class="fas fa-heart" style="margin-left: 0.5rem;"></i> {{ article.likes }} лайков
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    
+    <!-- Вкладка: Статьи -->
+    <div id="articles-tab" class="admin-tab-content" style="display: none;">
+        <div class="admin-card">
+            <div class="admin-card-header">
+                <h3><i class="fas fa-newspaper"></i> Все статьи</h3>
+                <div class="search-box">
+                    <input type="text" id="articleSearch" placeholder="Поиск по заголовку..." onkeyup="filterArticles()">
+                    <button class="btn-sm btn-primary" onclick="filterArticles()"><i class="fas fa-search"></i></button>
+                </div>
+            </div>
+            <div style="overflow-x: auto;">
+                <table class="admin-table" id="articlesTable">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Заголовок</th>
+                            <th>Автор</th>
+                            <th>Статус</th>
+                            <th>Просмотры</th>
+                            <th>Лайки</th>
+                            <th>Дата</th>
+                            <th>Действия</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for article in all_articles %}
+                        <tr class="article-row">
+                            <td>{{ article.id }}</td>
+                            <td><a href="/article/{{ article.slug }}" style="color: #fff;">{{ article.title[:50] }}{% if article.title|length > 50 %}...{% endif %}</a></td>
+                            <td>{{ article.author_name if article.author_name else article.user_id }}</td>
+                            <td>
+                                <span class="badge {% if article.is_published %}badge-published{% else %}badge-draft{% endif %}">
+                                    {% if article.is_published %}✅ Опубликовано{% else %}📝 Черновик{% endif %}
+                                </span>
+                            </td>
+                            <td>{{ article.views }}</td>
+                            <td>{{ article.likes }}</td>
+                            <td>{{ article.created_at.strftime('%d.%m.%Y') }}</td>
+                            <td>
+                                <form method="post" action="/admin/approve/{{ article.id }}" style="display: inline;">
+                                    <button type="submit" class="btn-sm btn-primary" {% if article.is_published %}disabled{% endif %} title="Опубликовать">
+                                        <i class="fas fa-check"></i>
+                                    </button>
+                                </form>
+                                <form method="post" action="/admin/delete/{{ article.id }}" style="display: inline;">
+                                    <button type="submit" class="btn-sm btn-danger" onclick="return confirm('Удалить статью?')" title="Удалить">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Вкладка: Пользователи -->
+    <div id="users-tab" class="admin-tab-content" style="display: none;">
+        <div class="admin-card">
+            <div class="admin-card-header">
+                <h3><i class="fas fa-users"></i> Все пользователи</h3>
+                <div class="search-box">
+                    <input type="text" id="userSearch" placeholder="Поиск по имени или email..." onkeyup="filterUsers()">
+                </div>
+            </div>
+            <div style="overflow-x: auto;">
+                <table class="admin-table" id="usersTable">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Имя</th>
+                            <th>Email</th>
+                            <th>Роль</th>
+                            <th>Статей</th>
+                            <th>Дата</th>
+                            <th>Действия</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for u in all_users %}
+                        <tr class="user-row">
+                            <td>{{ u.id }}</td>
+                            <td>{{ u.username }}</td>
+                            <td>{{ u.email }}</td>
+                            <td>
+                                <span class="badge {% if u.is_admin %}badge-admin{% else %}badge-user{% endif %}">
+                                    {% if u.is_admin %}<i class="fas fa-crown"></i> Админ{% else %}<i class="fas fa-user"></i> Пользователь{% endif %}
+                                </span>
+                            </td>
+                            <td>{{ u.articles_count if u.articles_count else 0 }}</td>
+                            <td>{{ u.created_at.strftime('%d.%m.%Y') }}</td>
+                            <td>
+                                <form method="post" action="/admin/toggle-admin/{{ u.id }}" style="display: inline;">
+                                    <button type="submit" class="btn-sm btn-warning" {% if u.id == user.id %}disabled{% endif %} title="{% if u.is_admin %}Снять админа{% else %}Назначить админом{% endif %}">
+                                        <i class="fas {% if u.is_admin %}fa-user{% else %}fa-crown{% endif %}"></i>
+                                    </button>
+                                </form>
+                                <form method="post" action="/admin/delete-user/{{ u.id }}" style="display: inline;">
+                                    <button type="submit" class="btn-sm btn-danger" onclick="return confirm('Удалить пользователя? Все его данные будут удалены!')" {% if u.id == user.id %}disabled{% endif %} title="Удалить">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Вкладка: Комментарии -->
+    <div id="comments-tab" class="admin-tab-content" style="display: none;">
+        <div class="admin-card">
+            <div class="admin-card-header">
+                <h3><i class="fas fa-comments"></i> Все комментарии</h3>
+            </div>
+            <div style="overflow-x: auto;">
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Текст</th>
+                            <th>Автор</th>
+                            <th>Статья</th>
+                            <th>Дата</th>
+                            <th>Действия</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for comment in all_comments %}
+                        <tr>
+                            <td>{{ comment.id }}</td>
+                            <td>{{ comment.text[:60] }}{% if comment.text|length > 60 %}...{% endif %}</td>
+                            <td>{{ comment.author_name if comment.author_name else comment.user_id }}</td>
+                            <td><a href="/article/{{ comment.article_slug }}" style="color: #ff8c00;">К статье</a></td>
+                            <td>{{ comment.created_at.strftime('%d.%m.%Y %H:%M') }}</td>
+                            <td>
+                                <form method="post" action="/admin/delete-comment/{{ comment.id }}" style="display: inline;">
+                                    <button type="submit" class="btn-sm btn-danger" onclick="return confirm('Удалить комментарий?')" title="Удалить">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Вкладка: Категории -->
+    <div id="categories-tab" class="admin-tab-content" style="display: none;">
+        <div class="admin-card">
+            <div class="admin-card-header">
+                <h3><i class="fas fa-plus-circle"></i> Добавить категорию</h3>
+            </div>
+            <div style="padding: 1.5rem;">
+                <form method="post" action="/admin/add-category" style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                    <input type="text" name="name" placeholder="Название категории" required style="flex: 1; padding: 0.6rem; background: #1a1a1a; border: 1px solid #333; border-radius: 10px; color: #fff;">
+                    <input type="text" name="icon" placeholder="Иконка (эмодзи)" value="📁" style="width: 100px; padding: 0.6rem; background: #1a1a1a; border: 1px solid #333; border-radius: 10px; color: #fff;">
+                    <button type="submit" class="btn btn-primary"><i class="fas fa-plus"></i> Добавить</button>
+                </form>
+            </div>
+        </div>
+        
+        <div class="admin-card" style="margin-top: 1.5rem;">
+            <div class="admin-card-header">
+                <h3><i class="fas fa-tags"></i> Существующие категории</h3>
+            </div>
+            <div style="overflow-x: auto;">
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Иконка</th>
+                            <th>Название</th>
+                            <th>Slug</th>
+                            <th>Статей</th>
+                            <th>Действия</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for cat in categories %}
+                        <tr>
+                            <td>{{ cat.id }}</td>
+                            <td style="font-size: 1.3rem;">{{ cat.icon }}</td>
+                            <td>{{ cat.name }}</td>
+                            <td>{{ cat.slug }}</td>
+                            <td>{{ cat.articles_count if cat.articles_count else 0 }}</td>
+                            <td>
+                                <form method="post" action="/admin/delete-category/{{ cat.id }}" style="display: inline;">
+                                    <button type="submit" class="btn-sm btn-danger" onclick="return confirm('Удалить категорию? Статьи останутся без категории')" title="Удалить">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Вкладка: Жалобы -->
+    <div id="complaints-tab" class="admin-tab-content" style="display: none;">
+        <div class="admin-card">
+            <div class="admin-card-header">
+                <h3><i class="fas fa-flag"></i> Жалобы пользователей</h3>
+                <span class="badge badge-pending">{{ complaints|length }} жалоб</span>
+            </div>
+            <div style="overflow-x: auto;">
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Дата</th>
+                            <th>От кого</th>
+                            <th>Тип</th>
+                            <th>Контент</th>
+                            <th>Причина</th>
+                            <th>Статус</th>
+                            <th>Действия</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for c in complaints %}
+                        <tr>
+                            <td>{{ c.id }}</td>
+                            <td>{{ c.created_at.strftime('%d.%m.%Y %H:%M') }}</td>
+                            <td>{{ c.user_name }}</td>
+                            <td>
+                                {% if c.content_type == 'article' %}
+                                <span class="badge badge-published">📄 Статья</span>
+                                {% else %}
+                                <span class="badge" style="background: rgba(255,0,0,0.15); color: #ff4444;">🎬 Видео</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <a href="{{ c.content_url }}" target="_blank" style="color: #ff8c00; text-decoration: none;">
+                                    {{ c.content_title[:30] }}{% if c.content_title|length > 30 %}...{% endif %}
+                                </a>
+                            </td>
+                            <td style="max-width: 200px;">
+                                <span title="{{ c.reason }}">{{ c.reason[:40] }}{% if c.reason|length > 40 %}...{% endif %}</span>
+                            </td>
+                            <td>
+                                {% if c.status == 'pending' %}
+                                <span class="badge badge-pending">⏳ Ожидает</span>
+                                {% elif c.status == 'resolved' %}
+                                <span class="badge badge-published">✅ Решено</span>
+                                {% elif c.status == 'dismissed' %}
+                                <span class="badge" style="background: rgba(239,68,68,0.15); color: #ef4444;">❌ Отклонено</span>
+                                {% else %}
+                                <span class="badge">{{ c.status }}</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <div style="display: flex; gap: 0.3rem;">
+                                    {% if c.status == 'pending' %}
+                                    <form method="post" action="/admin/complaint/{{ c.id }}/resolve" style="display: inline;">
+                                        <button type="submit" class="btn-sm btn-primary" title="Отметить как решённое">
+                                            <i class="fas fa-check"></i>
+                                        </button>
+                                    </form>
+                                    <form method="post" action="/admin/complaint/{{ c.id }}/dismiss" style="display: inline;">
+                                        <button type="submit" class="btn-sm btn-warning" title="Отклонить">
+                                            <i class="fas fa-times"></i>
+                                        </button>
+                                    </form>
+                                    {% endif %}
+                                    <form method="post" action="/admin/complaint/{{ c.id }}/delete" style="display: inline;">
+                                        <button type="submit" class="btn-sm btn-danger" onclick="return confirm('Удалить жалобу?')" title="Удалить">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="8" style="text-align: center; padding: 3rem; color: #666;">
+                                <i class="fas fa-flag-checkered" style="font-size: 3rem; margin-bottom: 1rem; display: block;"></i>
+                                <p>Нет жалоб</p>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Вкладка: Слайдер -->
+    <div id="slider-tab" class="admin-tab-content" style="display: none;">
+        <div class="admin-card">
+            <div class="admin-card-header">
+                <h3><i class="fas fa-sliders-h"></i> Управление слайдером</h3>
+            </div>
+            <div style="padding: 1.5rem; text-align: center;">
+                <a href="/admin/slider" class="btn btn-primary" style="padding: 0.8rem 2rem;">
+                    <i class="fas fa-edit"></i> Перейти к управлению слайдером
+                </a>
+                <p style="color: #888; margin-top: 1rem;">Здесь вы можете добавлять, редактировать и удалять карточки в слайдере на главной странице</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function switchAdminTab(tab) {
+        document.querySelectorAll('.admin-tab-content').forEach(content => {
+            content.style.display = 'none';
+        });
+        document.getElementById(`${tab}-tab`).style.display = 'block';
+        
+        document.querySelectorAll('.admin-tab').forEach(btn => {
+            btn.classList.remove('active');
+        });
+        event.target.classList.add('active');
+    }
+    
+    function filterArticles() {
+        const search = document.getElementById('articleSearch').value.toLowerCase();
+        const rows = document.querySelectorAll('.article-row');
+        rows.forEach(row => {
+            const title = row.cells[1].textContent.toLowerCase();
+            row.style.display = title.includes(search) ? '' : 'none';
+        });
+    }
+    
+    function filterUsers() {
+        const search = document.getElementById('userSearch').value.toLowerCase();
+        const rows = document.querySelectorAll('.user-row');
+        rows.forEach(row => {
+            const name = row.cells[1].textContent.toLowerCase();
+            const email = row.cells[2].textContent.toLowerCase();
+            row.style.display = (name.includes(search) || email.includes(search)) ? '' : 'none';
+        });
+    }
+    
+    // Проверяем URL параметр для открытия нужной вкладки
+    const urlParams = new URLSearchParams(window.location.search);
+    const tabParam = urlParams.get('tab');
+    if (tabParam && tabParam === 'articles') {
+        switchAdminTab('articles');
+    }
+</script>
+{% endblock %}

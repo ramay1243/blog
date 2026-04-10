@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+
+{% block content %}
+<style>
+    .login-container {
+        max-width: 500px;
+        margin: 0 auto;
+    }
+    
+    .login-container h2 {
+        font-size: 2rem;
+        color: #fff;
+        border-left: 3px solid #ff8c00;
+        padding-left: 1rem;
+        margin-bottom: 2rem;
+    }
+    
+    .login-card {
+        background: #0d0d0d;
+        border-radius: 24px;
+        padding: 2rem;
+        border: 1px solid rgba(255, 140, 0, 0.2);
+    }
+    
+    .forgot-link {
+        text-align: center;
+        margin-top: 1.5rem;
+    }
+    
+    .forgot-link a {
+        color: #ff8c00;
+        font-size: 0.85rem;
+        text-decoration: none;
+        transition: color 0.2s;
+    }
+    
+    .forgot-link a:hover {
+        text-decoration: underline;
+    }
+</style>
+
+<div class="login-container">
+    <div class="login-card">
+        <h2><i class="fas fa-sign-in-alt"></i> Вход</h2>
+        
+        {% if error %}
+        <div class="alert"><i class="fas fa-exclamation-triangle"></i> {{ error }}</div>
+        {% endif %}
+        
+        <form method="post">
+            <div class="form-group">
+                <label><i class="fas fa-envelope"></i> Email:</label>
+                <input type="email" name="email" required placeholder="ваш@email.ru">
+            </div>
+            <div class="form-group">
+                <label><i class="fas fa-lock"></i> Пароль:</label>
+                <input type="password" name="password" required placeholder="••••••••">
+            </div>
+            <button type="submit" class="btn btn-primary" style="width: 100%;">
+                <i class="fas fa-arrow-right"></i> Войти
+            </button>
+        </form>
+        
+        <div class="forgot-link">
+            <a href="/forgot-password">
+                <i class="fas fa-question-circle"></i> Забыли пароль?
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

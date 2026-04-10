@@ -1,0 +1,328 @@
+{% extends "base.html" %}
+
+{% block content %}
+<style>
+    .videos-container {
+        width: 100%;
+        margin: 0;
+    }
+    
+    .videos-header {
+        margin-bottom: 2rem;
+        border-left: 3px solid #ff8c00;
+        padding-left: 1rem;
+    }
+    
+    .videos-header h1 {
+        font-size: 2rem;
+        color: #fff;
+    }
+    
+    .videos-header p {
+        color: #888;
+        margin-top: 0.3rem;
+    }
+    
+    .videos-grid {
+        display: flex;
+        flex-direction: column;
+        gap: 2rem;
+        margin-top: 1rem;
+    }
+    
+    .video-card {
+        background: #0d0d0d;
+        border-radius: 20px;
+        overflow: hidden;
+        transition: all 0.3s ease;
+        border: 1px solid rgba(255, 140, 0, 0.15);
+    }
+    
+    .video-card:hover {
+        transform: translateY(-5px);
+        border-color: rgba(255, 140, 0, 0.4);
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
+    }
+    
+    .video-header {
+        padding: 1.5rem 1.5rem 0.5rem 1.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        padding-bottom: 1rem;
+    }
+    
+    .author-avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #ff8c00, #ff6600);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        color: #000;
+        font-size: 1.2rem;
+        overflow: hidden;
+    }
+    
+    .author-avatar img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+    
+    .author-info {
+        flex: 1;
+    }
+    
+    .author-name {
+        font-weight: 600;
+        color: #fff;
+        font-size: 0.9rem;
+    }
+    
+    .author-name a {
+        color: #fff;
+        text-decoration: none;
+    }
+    
+    .author-name a:hover {
+        color: #ff8c00 !important;
+    }
+    
+    .video-date {
+        font-size: 0.7rem;
+        color: #888;
+    }
+    
+    .video-badge {
+        background: rgba(255, 0, 0, 0.15);
+        color: #ff4444;
+        padding: 4px 10px;
+        border-radius: 20px;
+        font-size: 0.7rem;
+        font-weight: 600;
+    }
+    
+    .video-content {
+        padding: 1.5rem;
+    }
+    
+    .video-title {
+        font-size: 1.35rem;
+        font-weight: 700;
+        margin-bottom: 1rem;
+        line-height: 1.4;
+    }
+    
+    .video-title a {
+        color: #fff;
+        text-decoration: none;
+        transition: color 0.2s;
+    }
+    
+    .video-title a:hover {
+        color: #ff8c00;
+    }
+    
+    .video-player-inline {
+        margin: 0 0 1rem 0;
+        border-radius: 12px;
+        overflow: hidden;
+        background: #000;
+    }
+    
+    .video-player-inline video {
+        width: 100%;
+        max-height: 450px;
+        display: block;
+    }
+    
+    .video-description {
+        color: #aaa;
+        line-height: 1.5;
+        margin: 0 0 1rem 0;
+        font-size: 0.9rem;
+    }
+    
+    .video-footer {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding-top: 1rem;
+        border-top: 1px solid rgba(255, 255, 255, 0.05);
+    }
+    
+    .watch-btn {
+        color: #ff8c00;
+        text-decoration: none;
+        font-size: 0.85rem;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        transition: gap 0.2s;
+    }
+    
+    .watch-btn:hover {
+        gap: 0.8rem;
+    }
+    
+    .video-stats {
+        display: flex;
+        gap: 0.8rem;
+        color: #666;
+        font-size: 0.75rem;
+    }
+    
+    .video-stats span {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.25rem;
+    }
+    
+    .empty-videos {
+        text-align: center;
+        padding: 4rem;
+        background: #0d0d0d;
+        border-radius: 24px;
+        border: 1px dashed #ff8c00;
+    }
+    
+    .create-btn {
+        margin-top: 1rem;
+        display: inline-block;
+    }
+    
+    @media (max-width: 768px) {
+        .video-header {
+            padding: 1rem 1rem 0.5rem 1rem;
+        }
+        .video-content {
+            padding: 1rem;
+        }
+        .video-title {
+            font-size: 1.2rem;
+        }
+        .video-player-inline video {
+            max-height: 250px;
+        }
+    }
+    
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    .video-card {
+        animation: fadeInUp 0.4s ease forwards;
+        opacity: 0;
+    }
+    
+    .video-card:nth-child(1) { animation-delay: 0.05s; }
+    .video-card:nth-child(2) { animation-delay: 0.1s; }
+    .video-card:nth-child(3) { animation-delay: 0.15s; }
+    .video-card:nth-child(4) { animation-delay: 0.2s; }
+    .video-card:nth-child(5) { animation-delay: 0.25s; }
+</style>
+
+<div class="videos-container">
+    <div class="videos-header">
+        <h1><i class="fas fa-video"></i> Видео</h1>
+        <p>Смотрите видео от авторов сообщества</p>
+    </div>
+    
+    {% if user %}
+    <div style="margin-bottom: 2rem;">
+        <a href="/create-video" class="btn btn-primary">
+            <i class="fas fa-upload"></i> Загрузить видео
+        </a>
+    </div>
+    {% endif %}
+    
+    <div class="videos-grid">
+        {% for video in videos %}
+        <div class="video-card">
+            <!-- Заголовок с автором -->
+            <div class="video-header">
+                <div class="author-avatar">
+                    {% if video.author_avatar and video.author_avatar != 'default.png' %}
+                    <img src="/static/avatars/{{ video.author_avatar }}" alt="{{ video.author_name }}">
+                    {% else %}
+                    {{ video.author_name[0]|upper if video.author_name else 'U' }}
+                    {% endif %}
+                </div>
+                <div class="author-info">
+                    <div class="author-name">
+                        <a href="/user/{{ video.user_id }}"><i class="fas fa-user"></i> {{ video.author_name }}</a>
+                    </div>
+                    <div class="video-date">{{ video.created_at.strftime('%d %B %Y') }}</div>
+                </div>
+                <div class="video-badge">
+                    <i class="fas fa-video"></i> Видео
+                </div>
+            </div>
+            
+<!-- Контент -->
+<div class="video-content">
+    <!-- 1. ЗАГОЛОВОК ВИДЕО (первый) -->
+    <h3 class="video-title">
+        <a href="/video/{{ video.id }}">{{ video.title }}</a>
+    </h3>
+    
+    <!-- 2. ВИДЕО-ПЛЕЕР (второй, под заголовком) -->
+    <div class="video-player-inline">
+        <video controls poster="{{ video.thumbnail_url if video.thumbnail_url else '/static/uploads/videos/default_thumb.jpg' }}">
+            <source src="{{ video.video_url }}" type="video/mp4">
+            Ваш браузер не поддерживает видео.
+        </video>
+    </div>
+    
+    <!-- 3. ОПИСАНИЕ (третье, под видео) -->
+    {% if video.description %}
+    <div class="video-description">
+        {{ video.description }}
+    </div>
+    {% endif %}
+    
+    <!-- 4. Футер с кнопкой и статистикой -->
+    <div class="video-footer">
+        <a href="/video/{{ video.id }}" class="watch-btn">
+            Смотреть <i class="fas fa-arrow-right"></i>
+        </a>
+        <div class="video-stats">
+            <span><i class="fas fa-play"></i> {{ video.views }}</span>
+            <span><i class="fas fa-heart"></i> {{ video.likes }}</span>
+        </div>
+    </div>
+</div>
+        </div>
+        {% else %}
+        <div class="empty-videos">
+            <div class="empty-state-icon">
+                <i class="fas fa-video" style="font-size: 4rem; color: #666;"></i>
+            </div>
+            <h3>Пока нет видео</h3>
+            <p style="color: #888;">Будьте первым, кто загрузит видео!</p>
+            {% if user %}
+            <a href="/create-video" class="btn btn-primary create-btn">
+                <i class="fas fa-upload"></i> Загрузить видео
+            </a>
+            {% else %}
+            <a href="/register" class="btn btn-primary create-btn">
+                <i class="fas fa-user-plus"></i> Зарегистрироваться
+            </a>
+            {% endif %}
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

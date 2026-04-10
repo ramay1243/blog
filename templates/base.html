@@ -1,0 +1,822 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}StoryBlog{% endblock %}</title>
+    <meta name="description" content="{{ meta_description|default('Платформа для историй') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+    <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: 'Inter', sans-serif; 
+            background: #0a0a0a; 
+            color: #e0e0e0;
+            padding-right: 2rem;
+        }
+        
+        .navbar { 
+            background: #000; 
+            border-bottom: 2px solid #ff8c00; 
+            padding: 1rem 2rem; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            flex-wrap: wrap;
+            gap: 1rem;
+            padding-right: 10rem;
+        }
+        
+        .navbar h2 {
+            margin-left: 10rem;
+        }
+        
+        .nav-links { 
+            display: flex; 
+            align-items: center; 
+            flex-wrap: wrap; 
+            gap: 1rem;
+        }
+        
+        .nav-links a { 
+            color: #e0e0e0; 
+            text-decoration: none; 
+            transition: color 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.3rem;
+        }
+        
+        .nav-links a:hover { color: #ff8c00; }
+        
+        .container { 
+            max-width: 1200px; 
+            margin: 2rem auto; 
+            padding: 0 2rem;
+            margin-left: 10rem;
+            margin-right: 2rem;
+        }
+        
+        .btn { padding: 10px 24px; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; transition: all 0.3s; }
+        .btn-primary { background: #ff8c00; color: #000; }
+        .btn-primary:hover { background: #ffa233; transform: translateY(-2px); }
+        .btn-outline { background: transparent; border: 1px solid #ff8c00; color: #ff8c00; }
+        .btn-outline:hover { background: #ff8c00; color: #000; }
+        
+        .card { background: #111; border-radius: 12px; padding: 1.5rem; margin-bottom: 1.5rem; border-left: 3px solid #ff8c00; }
+        .form-group { margin-bottom: 1rem; }
+        
+        input, textarea, select { 
+            width: 100%; 
+            padding: 10px; 
+            background: #1a1a1a; 
+            border: 1px solid #333; 
+            color: #fff; 
+            border-radius: 6px; 
+        }
+        
+        textarea { min-height: 200px; }
+        .alert { padding: 1rem; border-radius: 8px; margin-bottom: 1rem; background: #ff8c0022; border: 1px solid #ff8c00; color: #ff8c00; }
+        .avatar { width: 50px; height: 50px; border-radius: 50%; object-fit: cover; }
+        .grid { display: grid; gap: 1.5rem; }
+        @media (min-width: 768px) { .grid-2 { grid-template-columns: repeat(2, 1fr); } }
+        
+        .search-wrapper {
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+        }
+        
+        .search-icon-btn {
+            background: none;
+            border: none;
+            color: #e0e0e0;
+            cursor: pointer;
+            font-size: 1.2rem;
+            padding: 0.3rem 0.5rem;
+            border-radius: 40px;
+            transition: background 0.2s;
+        }
+        
+        .search-icon-btn:hover {
+            background: #1a1a1a;
+            color: #ff8c00;
+        }
+        
+        .search-expanded {
+            display: none;
+            align-items: center;
+            gap: 0.5rem;
+            background: #1a1a1a;
+            border-radius: 40px;
+            padding: 0.2rem 0.5rem;
+            border: 1px solid #333;
+            animation: fadeIn 0.2s ease;
+        }
+        
+        .search-expanded.show {
+            display: flex;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateX(-10px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+        
+        .search-expanded-input {
+            padding: 0.4rem 0.8rem;
+            background: #0d0d0d;
+            border: none;
+            border-radius: 30px;
+            color: #fff;
+            font-size: 0.85rem;
+            width: 200px;
+            outline: none;
+        }
+        
+        .search-expanded-input:focus {
+            border: 1px solid #ff8c00;
+            padding: 0.35rem 0.75rem;
+        }
+        
+        .search-expanded-btn {
+            background: #ff8c00;
+            border: none;
+            border-radius: 30px;
+            padding: 0.3rem 0.8rem;
+            color: #000;
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: all 0.2s;
+        }
+        
+        .search-expanded-btn:hover {
+            background: #ffa233;
+        }
+        
+        .search-expanded-close {
+            background: none;
+            border: none;
+            color: #888;
+            cursor: pointer;
+            font-size: 1.2rem;
+            padding: 0 0.3rem;
+            transition: color 0.2s;
+        }
+        
+        .search-expanded-close:hover {
+            color: #ff8c00;
+        }
+        
+        .nav-avatar {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+        
+        .nav-avatar-placeholder {
+            display: inline-block;
+            width: 28px;
+            height: 28px;
+            background: #ff8c00;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 28px;
+            color: #000;
+            font-weight: bold;
+            font-size: 0.8rem;
+        }
+        
+        .user-menu {
+            position: relative;
+        }
+        
+        .user-menu-btn {
+            background: none;
+            border: none;
+            color: #e0e0e0;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 1rem;
+            padding: 0.3rem 0.5rem;
+            border-radius: 40px;
+            transition: background 0.2s;
+        }
+        
+        .user-menu-btn:hover {
+            background: #1a1a1a;
+        }
+        
+        .user-dropdown {
+            display: none;
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background: #1a1a1a;
+            border-radius: 12px;
+            min-width: 220px;
+            margin-top: 0.5rem;
+            z-index: 1000;
+            border: 1px solid #333;
+            overflow: hidden;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+        }
+        
+        .user-dropdown.show {
+            display: block !important;
+        }
+        
+        .dropdown-item {
+            display: block;
+            padding: 0.75rem 1rem;
+            color: #e0e0e0;
+            text-decoration: none;
+            transition: background 0.2s;
+            font-size: 0.85rem;
+        }
+        
+        .dropdown-item:hover {
+            background: #2a2a2a;
+            color: #ff8c00;
+        }
+        
+        .notif-menu {
+            position: relative;
+        }
+        
+        .notif-btn {
+            background: none;
+            border: none;
+            color: #e0e0e0;
+            cursor: pointer;
+            font-size: 1.2rem;
+            position: relative;
+            padding: 0.3rem 0.5rem;
+            border-radius: 40px;
+            transition: background 0.2s;
+        }
+        
+        .notif-btn:hover {
+            background: #1a1a1a;
+        }
+        
+        .notif-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: #ff8c00;
+            color: #000;
+            font-size: 0.6rem;
+            padding: 2px 5px;
+            border-radius: 10px;
+            font-weight: bold;
+        }
+        
+        .notif-dropdown {
+            display: none;
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background: #1a1a1a;
+            border-radius: 12px;
+            width: 320px;
+            max-width: 90vw;
+            margin-top: 0.5rem;
+            z-index: 1000;
+            border: 1px solid #333;
+            overflow: hidden;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+        }
+        
+        .notif-dropdown.show {
+            display: block !important;
+        }
+        
+        .notif-header {
+            padding: 0.75rem 1rem;
+            border-bottom: 1px solid #333;
+            background: #0d0d0d;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .notif-header span {
+            font-weight: bold;
+            color: #ff8c00;
+            font-size: 0.85rem;
+        }
+        
+        .notif-mark-all {
+            background: none;
+            border: none;
+            color: #888;
+            font-size: 0.7rem;
+            cursor: pointer;
+        }
+        
+        .notif-mark-all:hover {
+            color: #ff8c00;
+        }
+        
+        .notif-list {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        
+        .notif-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem 1rem;
+            border-bottom: 1px solid #222;
+            text-decoration: none;
+            transition: background 0.2s;
+            cursor: pointer;
+        }
+        
+        .notif-item:hover {
+            background: #2a2a2a;
+        }
+        
+        .notif-item.unread {
+            background: #1a0a00;
+        }
+        
+        .notif-icon {
+            font-size: 1.2rem;
+        }
+        
+        .notif-content {
+            flex: 1;
+        }
+        
+        .notif-message {
+            font-size: 0.8rem;
+            color: #ddd;
+            margin-bottom: 0.2rem;
+        }
+        
+        .notif-time {
+            font-size: 0.65rem;
+            color: #666;
+        }
+        
+        .notif-empty {
+            padding: 2rem;
+            text-align: center;
+            color: #666;
+            font-size: 0.8rem;
+        }
+        
+        /* Hero блок - картинка на весь фон */
+        .hero {
+            position: relative;
+            height: 260px;
+            width: 100%;
+            max-width: 1200px;
+            margin-left: auto;
+            margin-right: auto;
+            border-radius: 24px;
+            overflow: hidden;
+            margin-bottom: 2rem;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a0a00 100%);
+        }
+        
+        .hero-slider {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
+        
+        .hero-slider-track {
+            display: flex;
+            width: 100%;
+            height: 100%;
+            transition: transform 0.5s ease-in-out;
+        }
+        
+        .hero-slide {
+            position: relative;
+            min-width: 100%;
+            height: 100%;
+            flex-shrink: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+        }
+        
+        .hero-slide-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            z-index: 0;
+        }
+        
+        .hero-slide-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+        
+        .hero-slide-icon {
+            position: relative;
+            z-index: 2;
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .hero-slide h1 {
+            position: relative;
+            z-index: 2;
+            font-size: 1.8rem;
+            background: linear-gradient(135deg, #ff8c00 0%, #ffcc00 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin-bottom: 0.5rem;
+        }
+        
+        .hero-slide p {
+            position: relative;
+            z-index: 2;
+            font-size: 0.85rem;
+            color: #fff;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        .stats-bar {
+            display: flex;
+            justify-content: center;
+            gap: 1.5rem;
+            margin-top: 0.8rem;
+            flex-wrap: wrap;
+            max-width: 380px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        .stat-item {
+            text-align: center;
+        }
+        
+        .stat-number {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #ff8c00;
+        }
+        
+        .stat-label {
+            font-size: 0.7rem;
+            color: #888;
+        }
+        
+        @media (max-width: 768px) {
+            .hero { height: 220px; }
+            .hero-slide h1 { font-size: 1.3rem; }
+            .hero-slide-icon { font-size: 1.5rem; }
+            .stats-bar { gap: 1rem; }
+            .stat-number { font-size: 1rem; }
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<body>
+    <nav class="navbar">
+        <h2><a href="/" style="color:#ff8c00; text-decoration:none;">StoryBlog</a></h2>
+        <div class="nav-links">
+            <a href="/">Главная</a>
+            
+            <div class="search-wrapper">
+                <button class="search-icon-btn" id="searchIconBtn" onclick="toggleSearch()">
+                    <i class="fas fa-search"></i>
+                </button>
+                
+                <div id="searchExpanded" class="search-expanded">
+                    <form action="/search" method="get" style="display: flex; gap: 0.3rem;">
+                        <input type="text" name="q" class="search-expanded-input" placeholder="Поиск..." id="searchInput">
+                        <button type="submit" class="search-expanded-btn"><i class="fas fa-search"></i></button>
+                    </form>
+                    <button class="search-expanded-close" onclick="closeSearch()">✕</button>
+                </div>
+            </div>
+            
+            {% if user %}
+                <a href="/create">Написать</a>
+                
+                <div class="notif-menu">
+                    <button class="notif-btn" onclick="toggleNotifMenu()">
+                        <i class="fas fa-bell"></i>
+                        <span id="notif-badge" class="notif-badge" style="display: none;"></span>
+                    </button>
+                    
+                    <div id="notifDropdown" class="notif-dropdown">
+                        <div class="notif-header">
+                            <span>🔔 Уведомления</span>
+                            <button class="notif-mark-all" onclick="markAllNotifications()">Отметить все</button>
+                        </div>
+                        <div class="notif-list" id="notifList">
+                            <div class="notif-empty">Загрузка...</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="user-menu">
+                    <button class="user-menu-btn" onclick="toggleUserMenu()">
+                        {% if user.avatar and user.avatar != 'default.png' %}
+                        <img src="/static/avatars/{{ user.avatar }}" class="nav-avatar">
+                        {% else %}
+                        <span class="nav-avatar-placeholder">{{ user.username[0]|upper }}</span>
+                        {% endif %}
+                        {{ user.username }}
+                        <span style="font-size: 0.7rem;">▼</span>
+                    </button>
+                    
+                    <div id="userDropdown" class="user-dropdown">
+                        <div style="padding: 0.75rem 1rem; border-bottom: 1px solid #333; background: #0d0d0d;">
+                            <div style="font-weight: bold; color: #ff8c00;">{{ user.username }}</div>
+                            <div style="font-size: 0.7rem; color: #666;">{{ user.email }}</div>
+                        </div>
+                        <a href="/profile" class="dropdown-item"><i class="fas fa-user"></i> Мой профиль</a>
+                        <a href="/settings" class="dropdown-item"><i class="fas fa-cog"></i> Настройки</a>
+                        <a href="/my-subscriptions" class="dropdown-item"><i class="fas fa-users"></i> Подписки</a>
+                        <a href="/my-bookmarks" class="dropdown-item"><i class="fas fa-bookmark"></i> Закладки</a>
+                        <a href="/create" class="dropdown-item"><i class="fas fa-pen-alt"></i> Написать</a>
+                        <div style="border-top: 1px solid #333;"></div>
+                        <a href="/logout" class="dropdown-item" style="color: #ef4444;"><i class="fas fa-sign-out-alt"></i> Выйти</a>
+                    </div>
+                </div>
+                
+                {% if user.is_admin %}<a href="/admin">Админ</a>{% endif %}
+            {% else %}
+                <a href="/login">Войти</a>
+                <a href="/register">Регистрация</a>
+            {% endif %}
+        </div>
+    </nav>
+    
+    <div class="container">
+        <!-- Hero блок -->
+        <div class="hero" id="heroBlock">
+            <div class="hero-slider">
+                <div class="hero-slider-track" id="heroSliderTrack">
+                    {% for item in slider_items %}
+                    <div class="hero-slide" {% if item.link %}onclick="location.href='{{ item.link }}'" style="cursor: pointer;"{% endif %}>
+                        {% if item.image_url %}
+                        <img src="{{ item.image_url }}" class="hero-slide-bg" alt="slide" style="object-fit: {{ item.image_position if item.image_position else 'cover' }};">
+                        {% endif %}
+                        
+                        {% if item.overlay_opacity and item.overlay_opacity > 0 %}
+                        <div class="hero-slide-overlay" style="background: rgba(0,0,0,{{ item.overlay_opacity / 100 }});"></div>
+                        {% endif %}
+                        
+                        <div class="hero-slide-icon">
+                            {% if not item.image_url %}{{ item.icon }}{% endif %}
+                        </div>
+                        
+                        {% if item.title %}
+                        <h1 style="color: {{ item.text_color if item.text_color else '#ffffff' }}; font-size: {% if item.text_size == 'small' %}1.2rem{% elif item.text_size == 'large' %}2.2rem{% else %}1.8rem{% endif %};">
+                            {{ item.title }}
+                        </h1>
+                        {% endif %}
+                        
+                        {% if item.label %}
+                        <p style="color: {{ item.text_color if item.text_color else '#ffffff' }}; font-size: {% if item.text_size == 'small' %}0.7rem{% elif item.text_size == 'large' %}1rem{% else %}0.85rem{% endif %};">
+                            {{ item.label }}
+                        </p>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                    
+                    <div class="hero-slide">
+                        <div class="hero-slide-icon">✨</div>
+                        <h1>Истории, которые вдохновляют</h1>
+                        <p>Платформа для настоящих авторов. Делитесь мыслями, читайте истории других</p>
+                        <div class="stats-bar">
+                            <div class="stat-item">
+                                <div class="stat-number" id="totalArticles">0</div>
+                                <div class="stat-label">историй</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-number" id="totalViews">0</div>
+                                <div class="stat-label">просмотров</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-number" id="totalLikes">0</div>
+                                <div class="stat-label">лайков</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="hero-slide">
+                        <div class="hero-slide-icon">✍️</div>
+                        <h1>Найдите свой голос</h1>
+                        <p>Каждая история уникальна. Делитесь своими мыслями и вдохновляйте других</p>
+                    </div>
+                    <div class="hero-slide">
+                        <div class="hero-slide-icon">🤝</div>
+                        <h1>Сообщество авторов</h1>
+                        <p>Читайте, комментируйте, находите единомышленников и растите вместе</p>
+                    </div>
+                    <div class="hero-slide">
+                        <div class="hero-slide-icon">🚀</div>
+                        <h1>Растите с нами</h1>
+                        <p>Ваши истории увидят тысячи читателей. Начните прямо сейчас</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script>
+            function initHeroSlider() {
+                const track = document.getElementById('heroSliderTrack');
+                if (!track) return;
+                
+                let slides = Array.from(track.children);
+                if (slides.length <= 1) return;
+                
+                const firstClone = slides[0].cloneNode(true);
+                track.appendChild(firstClone);
+                slides = Array.from(track.children);
+                
+                let slideIndex = 0;
+                let isTransitioning = false;
+                
+                function showSlide(index) {
+                    if (isTransitioning) return;
+                    isTransitioning = true;
+                    const slideWidth = slides[0].offsetWidth;
+                    track.style.transform = `translateX(-${index * slideWidth}px)`;
+                    track.style.transition = 'transform 0.5s ease-in-out';
+                    setTimeout(() => { isTransitioning = false; }, 500);
+                }
+                
+                function nextSlide() {
+                    if (isTransitioning) return;
+                    slideIndex++;
+                    showSlide(slideIndex);
+                    if (slideIndex === slides.length - 1) {
+                        setTimeout(() => {
+                            track.style.transition = 'none';
+                            slideIndex = 0;
+                            showSlide(slideIndex);
+                            setTimeout(() => { track.style.transition = 'transform 0.5s ease-in-out'; }, 50);
+                        }, 500);
+                    }
+                }
+                
+                setInterval(nextSlide, 4000);
+                window.addEventListener('resize', () => {
+                    track.style.transition = 'none';
+                    showSlide(slideIndex);
+                    setTimeout(() => { track.style.transition = 'transform 0.5s ease-in-out'; }, 50);
+                });
+            }
+            
+            function loadHeroStats() {
+                fetch('/api/stats')
+                    .then(response => response.json())
+                    .then(data => {
+                        const totalArticles = document.getElementById('totalArticles');
+                        const totalViews = document.getElementById('totalViews');
+                        const totalLikes = document.getElementById('totalLikes');
+                        if (totalArticles) totalArticles.textContent = data.total_articles;
+                        if (totalViews) totalViews.textContent = data.total_views;
+                        if (totalLikes) totalLikes.textContent = data.total_likes;
+                    })
+                    .catch(err => console.log('Ошибка загрузки статистики'));
+            }
+            
+            if (document.getElementById('heroSliderTrack')) {
+                initHeroSlider();
+                loadHeroStats();
+            }
+        </script>
+        
+        {% block content %}{% endblock %}
+    </div>
+
+    <script>
+        function toggleSearch() {
+            const searchExpanded = document.getElementById('searchExpanded');
+            const searchIcon = document.getElementById('searchIconBtn');
+            if (searchExpanded.classList.contains('show')) {
+                searchExpanded.classList.remove('show');
+                searchIcon.style.display = 'inline-flex';
+            } else {
+                searchExpanded.classList.add('show');
+                searchIcon.style.display = 'none';
+                setTimeout(() => { document.getElementById('searchInput').focus(); }, 100);
+            }
+        }
+        
+        function closeSearch() {
+            const searchExpanded = document.getElementById('searchExpanded');
+            const searchIcon = document.getElementById('searchIconBtn');
+            searchExpanded.classList.remove('show');
+            searchIcon.style.display = 'inline-flex';
+        }
+        
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') closeSearch();
+        });
+        
+        function toggleUserMenu() {
+            document.getElementById('userDropdown').classList.toggle('show');
+        }
+        
+        document.addEventListener('click', function(event) {
+            const menu = document.querySelector('.user-menu');
+            if (menu && !menu.contains(event.target)) {
+                document.getElementById('userDropdown').classList.remove('show');
+            }
+        });
+        
+        function toggleNotifMenu() {
+            const dropdown = document.getElementById('notifDropdown');
+            const isShowing = dropdown.classList.contains('show');
+            if (!isShowing) {
+                loadNotifications();
+                fetch('/api/notifications/mark-all-read', { method: 'POST' })
+                    .then(() => { updateNotificationCount(); loadNotifications(); })
+                    .catch(err => console.log('Ошибка при отметке уведомлений'));
+            }
+            dropdown.classList.toggle('show');
+        }
+        
+        function loadNotifications() {
+            fetch('/api/notifications/list')
+                .then(response => response.json())
+                .then(data => {
+                    const notifList = document.getElementById('notifList');
+                    if (data.notifications.length === 0) {
+                        notifList.innerHTML = '<div class="notif-empty">📭 Нет уведомлений</div>';
+                        return;
+                    }
+                    notifList.innerHTML = data.notifications.map(notif => `
+                        <div class="notif-item ${notif.is_read ? '' : 'unread'}" onclick="markAndRedirect(${notif.id}, '${notif.link}')">
+                            <div class="notif-icon">${notif.type === 'comment' ? '💬' : notif.type === 'like' ? '❤️' : '🔔'}</div>
+                            <div class="notif-content">
+                                <div class="notif-message">${notif.message}</div>
+                                <div class="notif-time">${notif.time_ago}</div>
+                            </div>
+                        </div>
+                    `).join('');
+                })
+                .catch(err => { document.getElementById('notifList').innerHTML = '<div class="notif-empty">❌ Ошибка загрузки</div>'; });
+        }
+        
+        function markAndRedirect(notifId, link) {
+            fetch(`/api/notifications/read/${notifId}`, { method: 'POST' })
+                .then(() => { updateNotificationCount(); window.location.href = link; });
+        }
+        
+        function markAllNotifications() {
+            fetch('/api/notifications/mark-all-read', { method: 'POST' })
+                .then(() => { loadNotifications(); updateNotificationCount(); });
+        }
+        
+        function updateNotificationCount() {
+            fetch('/api/notifications/count')
+                .then(response => response.json())
+                .then(data => {
+                    const badge = document.getElementById('notif-badge');
+                    if (badge) {
+                        if (data.count > 0) {
+                            badge.style.display = 'inline-block';
+                            badge.textContent = data.count > 99 ? '99+' : data.count;
+                        } else {
+                            badge.style.display = 'none';
+                        }
+                    }
+                })
+                .catch(err => console.log('Ошибка загрузки уведомлений'));
+        }
+        
+        document.addEventListener('click', function(event) {
+            const notifMenu = document.querySelector('.notif-menu');
+            if (notifMenu && !notifMenu.contains(event.target)) {
+                document.getElementById('notifDropdown').classList.remove('show');
+            }
+        });
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            updateNotificationCount();
+            setInterval(updateNotificationCount, 5000);
+        });
+    </script>
+</body>
+</html>

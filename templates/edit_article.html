@@ -1,0 +1,300 @@
+{% extends "base.html" %}
+
+{% block content %}
+<style>
+    .edit-container {
+        max-width: 1000px;
+        margin: 0;
+    }
+    
+    .edit-header {
+        margin-bottom: 2rem;
+        border-left: 3px solid #ff8c00;
+        padding-left: 1rem;
+    }
+    
+    .edit-header h2 {
+        font-size: 2rem;
+        color: #fff;
+    }
+    
+    .edit-card {
+        background: #0d0d0d;
+        border-radius: 24px;
+        padding: 2rem;
+        border: 1px solid rgba(255, 140, 0, 0.2);
+    }
+    
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+    
+    .form-group label {
+        display: block;
+        color: #aaa;
+        margin-bottom: 0.5rem;
+        font-weight: 600;
+    }
+    
+    .form-group input,
+    .form-group select {
+        width: 100%;
+        padding: 0.8rem;
+        background: #1a1a1a;
+        border: 1px solid #333;
+        border-radius: 12px;
+        color: #fff;
+        font-size: 1rem;
+    }
+    
+    .form-group input:focus,
+    .form-group select:focus {
+        outline: none;
+        border-color: #ff8c00;
+    }
+    
+    /* Quill редактор */
+    .ql-container {
+        min-height: 350px;
+        font-size: 16px;
+        background: #1a1a1a;
+    }
+    
+    .ql-toolbar {
+        background: #0d0d0d;
+        border: 1px solid #333;
+        border-radius: 12px 12px 0 0;
+    }
+    
+    .ql-container {
+        border: 1px solid #333;
+        border-top: none;
+        border-radius: 0 0 12px 12px;
+        color: #fff;
+    }
+    
+    .ql-editor {
+        color: #fff;
+        min-height: 350px;
+    }
+    
+    .ql-editor p {
+        color: #ddd;
+    }
+    
+    .ql-editor h1, .ql-editor h2, .ql-editor h3 {
+        color: #ff8c00;
+    }
+    
+    .ql-editor a {
+        color: #ff8c00;
+    }
+    
+    .ql-editor img {
+        max-width: 100%;
+        border-radius: 12px;
+    }
+    
+    .image-upload-area {
+        margin-top: 0.5rem;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        flex-wrap: wrap;
+    }
+    
+    .custom-upload-btn {
+        background: #ff8c00;
+        color: #000;
+        padding: 0.3rem 0.8rem;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        cursor: pointer;
+        border: none;
+    }
+    
+    .checkbox-group {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .checkbox-group input {
+        width: auto;
+        transform: scale(1.2);
+    }
+    
+    .form-actions {
+        display: flex;
+        gap: 1rem;
+        margin-top: 2rem;
+    }
+    
+    .btn-save {
+        background: #ff8c00;
+        color: #000;
+        padding: 0.8rem 1.5rem;
+        border: none;
+        border-radius: 12px;
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+    
+    .btn-save:hover {
+        background: #ffa233;
+        transform: translateY(-2px);
+    }
+    
+    .btn-cancel {
+        background: #1a1a1a;
+        color: #aaa;
+        padding: 0.8rem 1.5rem;
+        border: 1px solid #333;
+        border-radius: 12px;
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s;
+        text-decoration: none;
+        display: inline-block;
+    }
+    
+    .btn-cancel:hover {
+        background: #2a2a2a;
+        color: #fff;
+    }
+    
+    @media (max-width: 768px) {
+        .edit-card {
+            padding: 1.5rem;
+        }
+        .form-actions {
+            flex-direction: column;
+        }
+    }
+</style>
+
+<div class="edit-header">
+    <h2>✏️ Редактирование статьи</h2>
+</div>
+
+<div class="edit-card">
+    <form method="post" id="articleForm">
+        <div class="form-group">
+            <label>📝 Заголовок</label>
+            <input type="text" name="title" value="{{ article.title }}" required>
+        </div>
+        
+        <div class="form-group">
+            <label>📂 Категория</label>
+            <select name="category_id" required>
+                <option value="">Выберите категорию</option>
+                {% for cat in categories %}
+                <option value="{{ cat.id }}" {% if current_category_id == cat.id %}selected{% endif %}>
+                    {{ cat.icon }} {{ cat.name }}
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+        
+        <div class="form-group">
+            <label>📄 Содержание</label>
+            <div id="editor" style="min-height: 350px;"></div>
+            <input type="hidden" name="content" id="content">
+            
+            <div class="image-upload-area">
+                <span style="color:#888; font-size:0.8rem;">📷 Загрузить картинку:</span>
+                <input type="file" id="imageUpload" accept="image/*" style="display: none;">
+                <button type="button" class="custom-upload-btn" onclick="document.getElementById('imageUpload').click()">
+                    Выбрать файл
+                </button>
+                <span id="uploadStatus" style="color:#ff8c00; font-size:0.7rem;"></span>
+            </div>
+        </div>
+        
+        <div class="form-group checkbox-group">
+            <input type="checkbox" name="is_published" value="true" {% if article.is_published %}checked{% endif %}>
+            <label>✅ Опубликовать (если не отмечено — сохранится как черновик)</label>
+        </div>
+        
+        <div class="form-actions">
+            <button type="submit" class="btn-save">💾 Сохранить изменения</button>
+            <a href="/profile" class="btn-cancel">↩️ Отмена</a>
+        </div>
+    </form>
+</div>
+
+<script>
+    // Инициализация Quill редактора с содержимым статьи
+    var quill = new Quill('#editor', {
+        theme: 'snow',
+        placeholder: 'Напишите вашу историю...',
+        modules: {
+            toolbar: [
+                ['bold', 'italic', 'underline', 'strike'],
+                ['blockquote', 'code-block'],
+                [{ 'header': 1 }, { 'header': 2 }],
+                [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+                [{ 'script': 'sub'}, { 'script': 'super' }],
+                [{ 'indent': '-1'}, { 'indent': '+1' }],
+                [{ 'direction': 'rtl' }],
+                [{ 'size': ['small', false, 'large', 'huge'] }],
+                [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
+                [{ 'color': [] }, { 'background': [] }],
+                [{ 'font': [] }],
+                [{ 'align': [] }],
+                ['clean'],
+                ['link', 'image', 'video']
+            ]
+        }
+    });
+    
+    // Загружаем существующее содержимое статьи в редактор
+    const existingContent = `{{ article.content|safe }}`;
+    quill.root.innerHTML = existingContent;
+    
+    // Загрузка картинок
+    const imageUpload = document.getElementById('imageUpload');
+    const uploadStatus = document.getElementById('uploadStatus');
+    
+    imageUpload.addEventListener('change', async function(e) {
+        const file = e.target.files[0];
+        if (!file) return;
+        
+        uploadStatus.textContent = 'Загрузка...';
+        
+        const formData = new FormData();
+        formData.append('file', file);
+        
+        try {
+            const response = await fetch('/upload-image', {
+                method: 'POST',
+                body: formData
+            });
+            const data = await response.json();
+            
+            if (data.location) {
+                const range = quill.getSelection();
+                quill.insertEmbed(range.index, 'image', data.location);
+                uploadStatus.textContent = '✓ Картинка загружена!';
+                setTimeout(() => { uploadStatus.textContent = ''; }, 2000);
+            } else if (data.error) {
+                uploadStatus.textContent = '❌ ' + data.error;
+            }
+        } catch (error) {
+            uploadStatus.textContent = '❌ Ошибка загрузки';
+        }
+        
+        imageUpload.value = '';
+    });
+    
+    // Перед отправкой формы — сохраняем HTML из редактора в скрытое поле
+    const form = document.getElementById('articleForm');
+    form.addEventListener('submit', function() {
+        const contentInput = document.getElementById('content');
+        contentInput.value = quill.root.innerHTML;
+    });
+</script>
+{% endblock %}

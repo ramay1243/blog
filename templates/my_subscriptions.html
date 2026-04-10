@@ -1,0 +1,327 @@
+{% extends "base.html" %}
+
+{% block content %}
+<style>
+    .subscriptions-container {
+        width: 100%;
+        margin: 0;
+    }
+    
+    .subscriptions-header {
+        margin-bottom: 2rem;
+        border-left: 3px solid #ff8c00;
+        padding-left: 1rem;
+    }
+    
+    .subscriptions-header h2 {
+        font-size: 1.8rem;
+        color: #fff;
+    }
+    
+    .subscriptions-header p {
+        color: #888;
+        margin-top: 0.3rem;
+    }
+    
+    .tabs {
+        display: flex;
+        gap: 1rem;
+        margin-bottom: 2rem;
+        border-bottom: 1px solid rgba(255, 140, 0, 0.2);
+        padding-bottom: 0.5rem;
+        flex-wrap: wrap;
+    }
+    
+    .tab {
+        padding: 0.5rem 1rem;
+        color: #888;
+        text-decoration: none;
+        transition: all 0.2s;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .tab.active {
+        color: #ff8c00;
+        border-bottom: 2px solid #ff8c00;
+    }
+    
+    .tab:hover {
+        color: #ff8c00;
+    }
+    
+    .feed-articles {
+        margin-top: 2rem;
+    }
+    
+    .feed-title {
+        margin: 2rem 0 1rem 0;
+        font-size: 1.3rem;
+        color: #ff8c00;
+    }
+    
+    .articles-grid {
+        display: flex;
+        flex-direction: column;
+        gap: 2rem;
+        margin-top: 1rem;
+    }
+    
+    .article-card {
+        background: #0d0d0d;
+        border-radius: 20px;
+        overflow: hidden;
+        transition: all 0.3s ease;
+        border: 1px solid rgba(255, 140, 0, 0.15);
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+    }
+    
+    .article-card:hover {
+        transform: translateY(-5px);
+        border-color: rgba(255, 140, 0, 0.4);
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
+    }
+    
+    .card-header {
+        padding: 1.5rem 1.5rem 0.5rem 1.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        padding-bottom: 1rem;
+    }
+    
+    .author-avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #ff8c00, #ff6600);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        color: #000;
+        font-size: 1.2rem;
+        overflow: hidden;
+    }
+    
+    .author-avatar img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+    
+    .author-info {
+        flex: 1;
+    }
+    
+    .author-name {
+        font-weight: 600;
+        color: #fff;
+        font-size: 0.9rem;
+    }
+    
+    .author-name a {
+        color: #fff;
+        text-decoration: none;
+    }
+    
+    .author-name a:hover {
+        color: #ff8c00 !important;
+    }
+    
+    .post-date {
+        font-size: 0.7rem;
+        color: #888;
+    }
+    
+    .cat-badge {
+        display: inline-block;
+        padding: 0.2rem 0.6rem;
+        background: rgba(255, 140, 0, 0.15);
+        border-radius: 12px;
+        font-size: 0.7rem;
+        color: #ff8c00;
+        margin-bottom: 0.5rem;
+    }
+    
+    .card-content {
+        padding: 1.5rem;
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .article-title {
+        font-size: 1.35rem;
+        font-weight: 700;
+        margin-bottom: 0.75rem;
+        line-height: 1.4;
+    }
+    
+    .article-title a {
+        color: #fff;
+        text-decoration: none;
+        transition: color 0.2s;
+    }
+    
+    .article-title a:hover {
+        color: #ff8c00;
+    }
+    
+    .article-excerpt {
+        color: #aaa;
+        line-height: 1.5;
+        margin-bottom: 1.5rem;
+        font-size: 0.9rem;
+        flex: 1;
+    }
+    
+    .card-footer {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding-top: 1rem;
+        border-top: 1px solid rgba(255, 255, 255, 0.05);
+        margin-top: auto;
+    }
+    
+    .read-more {
+        color: #ff8c00;
+        text-decoration: none;
+        font-size: 0.85rem;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        transition: gap 0.2s;
+    }
+    
+    .read-more:hover {
+        gap: 0.8rem;
+    }
+    
+    .stats-mini {
+        display: flex;
+        gap: 0.8rem;
+        color: #666;
+        font-size: 0.75rem;
+    }
+    
+    .stats-mini span {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.25rem;
+    }
+    
+    .empty-subscriptions {
+        text-align: center;
+        padding: 3rem;
+        background: #0d0d0d;
+        border-radius: 24px;
+        border: 1px dashed #ff8c00;
+    }
+    
+    .empty-state-icon {
+        font-size: 4rem;
+        margin-bottom: 1rem;
+        color: #666;
+    }
+    
+    @media (max-width: 768px) {
+        .card-header {
+            padding: 1rem 1rem 0.5rem 1rem;
+        }
+        .card-content {
+            padding: 1rem;
+        }
+        .article-title {
+            font-size: 1.2rem;
+        }
+        .tabs {
+            justify-content: center;
+        }
+    }
+</style>
+
+<div class="subscriptions-container">
+    <div class="subscriptions-header">
+        <h2><i class="fas fa-users"></i> Мои подписки</h2>
+        <p>Авторы, на которых вы подписаны, и их новые статьи</p>
+    </div>
+    
+    <div class="tabs">
+        <a href="/my-subscriptions" class="tab active">
+            <i class="fas fa-newspaper"></i> Лента подписок
+        </a>
+        <a href="/my-subscriptions/authors" class="tab">
+            <i class="fas fa-users"></i> Мои авторы
+        </a>
+    </div>
+    
+    <!-- Лента статей от подписанных авторов -->
+    <div class="feed-articles">
+        <h3 class="feed-title"><i class="fas fa-star"></i> Новые статьи от авторов</h3>
+        
+        <div class="articles-grid">
+            {% for article in feed_articles %}
+            <div class="article-card">
+                <div class="card-header">
+                    <div class="author-avatar">
+                        {% if article.author_avatar and article.author_avatar != 'default.png' %}
+                        <img src="/static/avatars/{{ article.author_avatar }}" style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover;">
+                        {% else %}
+                        {{ article.author_name[0]|upper if article.author_name else 'U' }}
+                        {% endif %}
+                    </div>
+                    <div class="author-info">
+                        <div class="author-name">
+                            <a href="/user/{{ article.user_id }}">{{ article.author_name }}</a>
+                        </div>
+                        <div class="post-date">{{ article.created_at.strftime('%d %B %Y') }}</div>
+                    </div>
+                </div>
+                
+                <div class="card-content">
+                    {% if article.category %}
+                    <div class="cat-badge">{{ article.category.icon }} {{ article.category.name }}</div>
+                    {% endif %}
+                    
+                    <h3 class="article-title">
+                        <a href="/article/{{ article.slug }}">{{ article.title }}</a>
+                    </h3>
+                    
+                    <div class="article-excerpt">
+                        {{ article.description[:140] }}{% if article.description|length > 140 %}...{% endif %}
+                    </div>
+                    
+                    <div class="card-footer">
+                        <a href="/article/{{ article.slug }}" class="read-more">
+                            Читать <i class="fas fa-arrow-right"></i>
+                        </a>
+                        <div class="stats-mini">
+                            <span><i class="fas fa-eye"></i> {{ article.views }}</span>
+                            <span><i class="fas fa-heart"></i> {{ article.likes }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% else %}
+            <div class="empty-subscriptions">
+                <div class="empty-state-icon">
+                    <i class="fas fa-inbox"></i>
+                </div>
+                <h3>Нет новых статей</h3>
+                <p>Подпишитесь на авторов, чтобы видеть их новые публикации здесь</p>
+                <a href="/" class="btn btn-primary" style="margin-top: 1rem; display: inline-block;">
+                    <i class="fas fa-search"></i> Найти авторов
+                </a>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}

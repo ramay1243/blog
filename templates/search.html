@@ -1,0 +1,259 @@
+{% extends "base.html" %}
+
+{% block content %}
+<style>
+    .search-container {
+        max-width: 900px;
+        margin: 0 auto;
+    }
+    
+    .search-header {
+        margin-bottom: 2rem;
+        padding-bottom: 1rem;
+        border-bottom: 1px solid rgba(255, 140, 0, 0.2);
+    }
+    
+    .search-header h2 {
+        font-size: 1.8rem;
+        color: #fff;
+        margin-bottom: 0.5rem;
+    }
+    
+    .search-header p {
+        color: #888;
+        font-size: 0.9rem;
+    }
+    
+    .search-query {
+        color: #ff8c00;
+    }
+    
+    .search-form-large {
+        margin-bottom: 2rem;
+    }
+    
+    .search-form-large form {
+        display: flex;
+        gap: 0.5rem;
+    }
+    
+    .search-form-large input {
+        flex: 1;
+        padding: 0.8rem 1rem;
+        background: #1a1a1a;
+        border: 1px solid #333;
+        border-radius: 12px;
+        color: #fff;
+        font-size: 1rem;
+    }
+    
+    .search-form-large input:focus {
+        outline: none;
+        border-color: #ff8c00;
+    }
+    
+    .search-form-large button {
+        padding: 0.8rem 1.5rem;
+        background: #ff8c00;
+        border: none;
+        border-radius: 12px;
+        color: #000;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+    
+    .search-form-large button:hover {
+        background: #ffa233;
+        transform: translateY(-2px);
+    }
+    
+    .results-count {
+        margin: 1.5rem 0;
+        color: #888;
+        font-size: 0.85rem;
+    }
+    
+    .no-results {
+        text-align: center;
+        padding: 3rem;
+        background: #0d0d0d;
+        border-radius: 24px;
+        border: 1px dashed #ff8c00;
+    }
+    
+    .no-results-icon {
+        font-size: 4rem;
+        margin-bottom: 1rem;
+    }
+    
+    .no-results h3 {
+        color: #fff;
+        margin-bottom: 0.5rem;
+    }
+    
+    .no-results p {
+        color: #888;
+    }
+    
+    .results-list {
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+    }
+    
+    .result-card {
+        background: #0d0d0d;
+        border-radius: 20px;
+        padding: 1.5rem;
+        border: 1px solid rgba(255, 140, 0, 0.15);
+        transition: all 0.2s;
+    }
+    
+    .result-card:hover {
+        border-color: rgba(255, 140, 0, 0.4);
+        transform: translateX(5px);
+    }
+    
+    .result-title {
+        font-size: 1.3rem;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+    }
+    
+    .result-title a {
+        color: #fff;
+        text-decoration: none;
+    }
+    
+    .result-title a:hover {
+        color: #ff8c00;
+    }
+    
+    .result-meta {
+        display: flex;
+        gap: 1.5rem;
+        margin-bottom: 0.75rem;
+        font-size: 0.75rem;
+        color: #666;
+        flex-wrap: wrap;
+    }
+    
+    .result-meta span {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.3rem;
+    }
+    
+    .result-excerpt {
+        color: #aaa;
+        font-size: 0.9rem;
+        line-height: 1.5;
+    }
+    
+    .result-excerpt mark {
+        background: rgba(255, 140, 0, 0.3);
+        color: #ff8c00;
+        padding: 0 0.2rem;
+        border-radius: 4px;
+    }
+    
+    .highlight {
+        background: rgba(255, 140, 0, 0.2);
+        color: #ff8c00;
+        font-weight: 500;
+    }
+    
+    @media (max-width: 768px) {
+        .search-container {
+            padding: 0 1rem;
+        }
+        
+        .search-header h2 {
+            font-size: 1.4rem;
+        }
+        
+        .result-title {
+            font-size: 1.1rem;
+        }
+        
+        .result-meta {
+            gap: 0.8rem;
+            font-size: 0.65rem;
+        }
+        
+        .search-form-large form {
+            flex-direction: column;
+        }
+        
+        .search-form-large button {
+            width: 100%;
+        }
+    }
+</style>
+
+<div class="search-container">
+    <div class="search-header">
+        <h2>🔍 Поиск по сайту</h2>
+        <p>Найдите интересующие вас истории и статьи</p>
+    </div>
+    
+    <div class="search-form-large">
+        <form method="get" action="/search">
+            <input type="text" name="q" value="{{ search_query }}" placeholder="Введите слово или фразу..." autocomplete="off">
+            <button type="submit">🔍 Найти</button>
+        </form>
+    </div>
+    
+    {% if search_query %}
+        <div class="results-count">
+            📊 Найдено <strong>{{ results_count }}</strong> {{ "статья" if results_count == 1 else "статей" }} по запросу <span class="search-query">"{{ search_query }}"</span>
+        </div>
+        
+        {% if results %}
+            <div class="results-list">
+                {% for article in results %}
+                <div class="result-card">
+                    <h3 class="result-title">
+                        <a href="/article/{{ article.slug }}">{{ article.title }}</a>
+                    </h3>
+                    <div class="result-meta">
+                        <span>👤 {{ article.author_name }}</span>
+                        <span>📅 {{ article.created_at.strftime('%d.%m.%Y') }}</span>
+                        <span>👁️ {{ article.views }} просмотров</span>
+                        <span>❤️ {{ article.likes }} лайков</span>
+                    </div>
+                    <div class="result-excerpt">
+                        {% set excerpt = article.description[:200] %}
+                        {% if search_query.lower() in excerpt.lower() %}
+                            {% set highlighted = excerpt.replace(search_query, '<mark>' + search_query + '</mark>') %}
+                            {{ highlighted|safe }}
+                        {% else %}
+                            {{ excerpt }}
+                        {% endif %}
+                        ...
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="no-results">
+                <div class="no-results-icon">🔍❌</div>
+                <h3>Ничего не найдено</h3>
+                <p>Попробуйте изменить поисковый запрос или написать свою историю</p>
+                {% if user %}
+                    <a href="/create" class="btn btn-primary" style="margin-top: 1rem; display: inline-block;">✍️ Написать статью</a>
+                {% else %}
+                    <a href="/register" class="btn btn-primary" style="margin-top: 1rem; display: inline-block;">🔐 Зарегистрироваться</a>
+                {% endif %}
+            </div>
+        {% endif %}
+    {% else %}
+        <div class="no-results">
+            <div class="no-results-icon">🔍</div>
+            <h3>Что будем искать?</h3>
+            <p>Введите слово или фразу в строку поиска выше</p>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

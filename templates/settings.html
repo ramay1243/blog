@@ -1,0 +1,458 @@
+{% extends "base.html" %}
+
+{% block content %}
+<style>
+.settings-container {
+    width: 100%;
+    margin: 0;
+}
+    
+    .settings-header {
+        margin-bottom: 2rem;
+        border-left: 3px solid #ff8c00;
+        padding-left: 1rem;
+    }
+    
+    .settings-header h2 {
+        font-size: 2rem;
+        color: #fff;
+    }
+    
+    .settings-header p {
+        color: #888;
+        margin-top: 0.3rem;
+    }
+    
+    .settings-tabs {
+        display: flex;
+        gap: 0.5rem;
+        margin-bottom: 2rem;
+        border-bottom: 1px solid rgba(255, 140, 0, 0.2);
+        padding-bottom: 0.5rem;
+        flex-wrap: wrap;
+    }
+    
+    .settings-tab {
+        background: none;
+        border: none;
+        padding: 0.75rem 1.5rem;
+        color: #888;
+        font-size: 0.95rem;
+        cursor: pointer;
+        transition: all 0.2s;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .settings-tab:hover {
+        color: #ff8c00;
+        background: rgba(255, 140, 0, 0.1);
+    }
+    
+    .settings-tab.active {
+        color: #ff8c00;
+        background: rgba(255, 140, 0, 0.15);
+    }
+    
+    .settings-card {
+        background: #0d0d0d;
+        border-radius: 24px;
+        padding: 2rem;
+        border: 1px solid rgba(255, 140, 0, 0.2);
+        animation: fadeIn 0.3s ease;
+        width: 100%;
+    }
+    
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .settings-card h3 {
+        color: #fff;
+        margin-bottom: 1.5rem;
+        font-size: 1.3rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+    
+    .form-group label {
+        display: block;
+        color: #aaa;
+        margin-bottom: 0.5rem;
+        font-weight: 600;
+    }
+    
+    .form-group input {
+        width: 100%;
+        padding: 0.8rem;
+        background: #1a1a1a;
+        border: 1px solid #333;
+        border-radius: 12px;
+        color: #fff;
+        font-size: 1rem;
+        transition: all 0.2s;
+    }
+    
+    .form-group input:focus {
+        outline: none;
+        border-color: #ff8c00;
+    }
+    
+    .btn-save {
+        background: #ff8c00;
+        color: #000;
+        padding: 0.8rem 1.5rem;
+        border: none;
+        border-radius: 12px;
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s;
+        width: 100%;
+    }
+    
+    .btn-save:hover {
+        background: #ffa233;
+        transform: translateY(-2px);
+    }
+    
+    .message {
+        padding: 0.8rem;
+        border-radius: 12px;
+        margin-bottom: 1rem;
+        text-align: center;
+        animation: fadeIn 0.3s ease;
+    }
+    
+    .message-success {
+        background: rgba(16, 185, 129, 0.15);
+        border: 1px solid #10b981;
+        color: #10b981;
+    }
+    
+    .message-error {
+        background: rgba(239, 68, 68, 0.15);
+        border: 1px solid #ef4444;
+        color: #ef4444;
+    }
+    
+    .info-text {
+        color: #666;
+        font-size: 0.8rem;
+        margin-top: 1rem;
+        text-align: center;
+    }
+    
+    .profile-info {
+        display: flex;
+        align-items: center;
+        gap: 2rem;
+        margin-bottom: 2rem;
+        padding-bottom: 1.5rem;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        flex-wrap: wrap;
+    }
+    
+    .profile-info-avatar {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #ff8c00, #ff6600);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+        flex-shrink: 0;
+    }
+    
+    .profile-info-avatar img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+    
+    .profile-info-avatar span {
+        font-size: 2.5rem;
+        font-weight: bold;
+        color: #000;
+    }
+    
+    .profile-info-details h4 {
+        color: #fff;
+        font-size: 1.2rem;
+        margin-bottom: 0.3rem;
+    }
+    
+    .profile-info-details p {
+        color: #888;
+        font-size: 0.85rem;
+        margin: 0.2rem 0;
+    }
+    
+    .notification-option {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1rem 0;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+    
+    .notification-option:last-child {
+        border-bottom: none;
+    }
+    
+    .notification-option-info h4 {
+        color: #fff;
+        font-size: 1rem;
+        margin-bottom: 0.2rem;
+    }
+    
+    .notification-option-info p {
+        color: #666;
+        font-size: 0.75rem;
+    }
+    
+    .toggle-switch {
+        position: relative;
+        width: 50px;
+        height: 24px;
+        flex-shrink: 0;
+    }
+    
+    .toggle-switch input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+    }
+    
+    .toggle-slider {
+        position: absolute;
+        cursor: pointer;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: #333;
+        transition: 0.3s;
+        border-radius: 24px;
+    }
+    
+    .toggle-slider:before {
+        position: absolute;
+        content: "";
+        height: 18px;
+        width: 18px;
+        left: 3px;
+        bottom: 3px;
+        background-color: white;
+        transition: 0.3s;
+        border-radius: 50%;
+    }
+    
+    input:checked + .toggle-slider {
+        background-color: #ff8c00;
+    }
+    
+    input:checked + .toggle-slider:before {
+        transform: translateX(26px);
+    }
+    
+    @media (max-width: 768px) {
+        .settings-card {
+            padding: 1.5rem;
+        }
+        .settings-tab {
+            padding: 0.5rem 1rem;
+            font-size: 0.85rem;
+        }
+        .profile-info {
+            flex-direction: column;
+            text-align: center;
+            gap: 1rem;
+        }
+        .profile-info-avatar {
+            margin: 0 auto;
+        }
+        .notification-option {
+            flex-direction: column;
+            text-align: center;
+        }
+        .toggle-switch {
+            margin: 0 auto;
+        }
+    }
+</style>
+
+<div class="settings-container">
+    <div class="settings-header">
+        <h2><i class="fas fa-cog"></i> Настройки</h2>
+        <p>Управляйте своим профилем и безопасностью</p>
+    </div>
+    
+    <div class="settings-tabs">
+        <button class="settings-tab active" onclick="switchTab('profile')">
+            <i class="fas fa-user-circle"></i> Профиль
+        </button>
+        <button class="settings-tab" onclick="switchTab('security')">
+            <i class="fas fa-lock"></i> Безопасность
+        </button>
+        <button class="settings-tab" onclick="switchTab('notifications')">
+            <i class="fas fa-bell"></i> Уведомления
+        </button>
+    </div>
+    
+    <div id="profile-tab" class="settings-card">
+        <h3><i class="fas fa-id-card"></i> Информация профиля</h3>
+        
+        <div class="profile-info">
+            <div class="profile-info-avatar">
+                {% if user.avatar and user.avatar != 'default.png' %}
+                <img src="/static/avatars/{{ user.avatar }}" alt="Аватар">
+                {% else %}
+                <span>{{ user.username[0]|upper }}</span>
+                {% endif %}
+            </div>
+            <div class="profile-info-details">
+                <h4><i class="fas fa-user"></i> {{ user.username }}</h4>
+                <p><i class="fas fa-envelope"></i> {{ user.email }}</p>
+                <p><i class="fas fa-calendar-alt"></i> Зарегистрирован: {{ user.created_at.strftime('%d.%m.%Y') }}</p>
+            </div>
+        </div>
+        
+        <div class="info-text">
+            <i class="fas fa-info-circle"></i> Чтобы изменить аватар или имя пользователя, перейдите в <a href="/profile" style="color: #ff8c00;">личный кабинет</a>
+        </div>
+    </div>
+    
+    <div id="security-tab" class="settings-card" style="display: none;">
+        <h3><i class="fas fa-shield-alt"></i> Смена пароля</h3>
+        
+        {% if message %}
+        <div class="message message-success"><i class="fas fa-check-circle"></i> {{ message }}</div>
+        {% endif %}
+        {% if error %}
+        <div class="message message-error"><i class="fas fa-exclamation-triangle"></i> {{ error }}</div>
+        {% endif %}
+        
+        <form method="post" action="/settings/change-password">
+            <div class="form-group">
+                <label><i class="fas fa-key"></i> Текущий пароль</label>
+                <input type="password" name="current_password" required placeholder="Введите текущий пароль">
+            </div>
+            
+            <div class="form-group">
+                <label><i class="fas fa-star"></i> Новый пароль</label>
+                <input type="password" name="new_password" required placeholder="Минимум 4 символа">
+            </div>
+            
+            <div class="form-group">
+                <label><i class="fas fa-check"></i> Подтверждение</label>
+                <input type="password" name="confirm_password" required placeholder="Повторите новый пароль">
+            </div>
+            
+            <button type="submit" class="btn-save">
+                <i class="fas fa-save"></i> Сменить пароль
+            </button>
+        </form>
+        
+        <div class="info-text">
+            <i class="fas fa-lightbulb"></i> Пароль должен содержать минимум 4 символа
+        </div>
+    </div>
+    
+    <div id="notifications-tab" class="settings-card" style="display: none;">
+        <h3><i class="fas fa-bell"></i> Настройки уведомлений</h3>
+        
+        <div class="notification-option">
+            <div class="notification-option-info">
+                <h4><i class="fas fa-comment"></i> Комментарии</h4>
+                <p>Уведомлять, когда кто-то комментирует вашу статью</p>
+            </div>
+            <label class="toggle-switch">
+                <input type="checkbox" id="comment-notify" checked>
+                <span class="toggle-slider"></span>
+            </label>
+        </div>
+        
+        <div class="notification-option">
+            <div class="notification-option-info">
+                <h4><i class="fas fa-heart"></i> Лайки</h4>
+                <p>Уведомлять, когда кто-то лайкает вашу статью</p>
+            </div>
+            <label class="toggle-switch">
+                <input type="checkbox" id="like-notify" checked>
+                <span class="toggle-slider"></span>
+            </label>
+        </div>
+        
+        <div class="notification-option">
+            <div class="notification-option-info">
+                <h4><i class="fas fa-user-plus"></i> Подписки</h4>
+                <p>Уведомлять, когда кто-то подписывается на вас</p>
+            </div>
+            <label class="toggle-switch">
+                <input type="checkbox" id="subscribe-notify" checked>
+                <span class="toggle-slider"></span>
+            </label>
+        </div>
+        
+        <div class="info-text" style="margin-top: 1rem;">
+            <i class="fas fa-save"></i> Настройки уведомлений сохраняются автоматически
+        </div>
+    </div>
+</div>
+
+<script>
+    function switchTab(tab) {
+        document.getElementById('profile-tab').style.display = 'none';
+        document.getElementById('security-tab').style.display = 'none';
+        document.getElementById('notifications-tab').style.display = 'none';
+        
+        document.getElementById(`${tab}-tab`).style.display = 'block';
+        
+        document.querySelectorAll('.settings-tab').forEach(btn => {
+            btn.classList.remove('active');
+        });
+        event.target.classList.add('active');
+    }
+    
+    const commentNotify = document.getElementById('comment-notify');
+    const likeNotify = document.getElementById('like-notify');
+    const subscribeNotify = document.getElementById('subscribe-notify');
+    
+    function saveNotificationSettings() {
+        const settings = {
+            comment: commentNotify.checked,
+            like: likeNotify.checked,
+            subscribe: subscribeNotify.checked
+        };
+        localStorage.setItem('notificationSettings', JSON.stringify(settings));
+    }
+    
+    function loadNotificationSettings() {
+        const saved = localStorage.getItem('notificationSettings');
+        if (saved) {
+            const settings = JSON.parse(saved);
+            commentNotify.checked = settings.comment !== undefined ? settings.comment : true;
+            likeNotify.checked = settings.like !== undefined ? settings.like : true;
+            subscribeNotify.checked = settings.subscribe !== undefined ? settings.subscribe : true;
+        }
+    }
+    
+    commentNotify.addEventListener('change', saveNotificationSettings);
+    likeNotify.addEventListener('change', saveNotificationSettings);
+    subscribeNotify.addEventListener('change', saveNotificationSettings);
+    
+    loadNotificationSettings();
+</script>
+{% endblock %}

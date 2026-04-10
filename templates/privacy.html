@@ -1,0 +1,150 @@
+{% extends "base.html" %}
+
+{% block content %}
+<style>
+    .privacy-container {
+        width: 100%;
+        margin: 0;
+    }
+    
+    .privacy-header {
+        margin-bottom: 2rem;
+        border-left: 3px solid #ff8c00;
+        padding-left: 1rem;
+    }
+    
+    .privacy-header h1 {
+        font-size: 2rem;
+        color: #fff;
+    }
+    
+    .privacy-card {
+        background: #0d0d0d;
+        border-radius: 24px;
+        padding: 2rem;
+        border: 1px solid rgba(255, 140, 0, 0.2);
+        width: 100%;
+    }
+    
+    .privacy-card h2 {
+        color: #ff8c00;
+        font-size: 1.3rem;
+        margin: 1.5rem 0 1rem 0;
+    }
+    
+    .privacy-card h2:first-of-type {
+        margin-top: 0;
+    }
+    
+    .privacy-card p {
+        color: #aaa;
+        line-height: 1.6;
+        margin-bottom: 1rem;
+    }
+    
+    .privacy-card ul {
+        list-style: none;
+        padding: 0;
+    }
+    
+    .privacy-card li {
+        color: #aaa;
+        margin-bottom: 0.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .privacy-card li i {
+        color: #ff8c00;
+        width: 20px;
+    }
+    
+    .warning-box {
+        background: rgba(255, 140, 0, 0.1);
+        border-left: 3px solid #ff8c00;
+        padding: 1.5rem;
+        border-radius: 12px;
+        margin: 1.5rem 0;
+    }
+    
+    .warning-box p {
+        margin-bottom: 0.5rem;
+    }
+    
+    .warning-box p:last-child {
+        margin-bottom: 0;
+    }
+    
+    .last-updated {
+        margin-top: 2rem;
+        padding-top: 1rem;
+        border-top: 1px solid rgba(255, 255, 255, 0.05);
+        color: #666;
+        font-size: 0.8rem;
+        text-align: center;
+    }
+</style>
+
+<div class="privacy-container">
+    <div class="privacy-header">
+        <h1><i class="fas fa-shield-alt"></i> Политика конфиденциальности</h1>
+    </div>
+    
+    <div class="privacy-card">
+        <h2><i class="fas fa-database"></i> Какие данные мы собираем?</h2>
+        <p>При регистрации на сайте мы собираем следующую информацию:</p>
+        <ul>
+            <li><i class="fas fa-envelope"></i> Адрес электронной почты</li>
+            <li><i class="fas fa-user"></i> Имя пользователя</li>
+            <li><i class="fas fa-key"></i> Хешированный пароль</li>
+        </ul>
+        
+        <h2><i class="fas fa-chart-line"></i> Как мы используем ваши данные?</h2>
+        <p>Ваши данные используются исключительно для:</p>
+        <ul>
+            <li><i class="fas fa-check-circle"></i> Идентификации пользователя</li>
+            <li><i class="fas fa-check-circle"></i> Отображения вашего профиля</li>
+            <li><i class="fas fa-check-circle"></i> Улучшения работы сайта</li>
+        </ul>
+        
+        <!-- ========== НОВЫЙ РАЗДЕЛ: ОТВЕТСТВЕННОСТЬ ЗА КОНТЕНТ ========== -->
+        <h2><i class="fas fa-gavel"></i> Ответственность за пользовательский контент</h2>
+        <p>StoryBlog является платформой для публикации пользовательского контента. Администрация сайта не несет ответственности за материалы, размещенные пользователями.</p>
+        
+        <div class="warning-box">
+            <p><i class="fas fa-exclamation-triangle" style="color: #ff8c00;"></i> <strong style="color: #ff8c00;">Важно:</strong></p>
+            <p>Пользователи самостоятельно несут полную ответственность за:</p>
+            <ul>
+                <li><i class="fas fa-angle-right"></i> Содержание публикуемых статей и видео</li>
+                <li><i class="fas fa-angle-right"></i> Нарушение авторских прав третьих лиц</li>
+                <li><i class="fas fa-angle-right"></i> Распространение запрещенной информации</li>
+                <li><i class="fas fa-angle-right"></i> Достоверность публикуемых материалов</li>
+                <li><i class="fas fa-angle-right"></i> Комментарии и оценки других пользователей</li>
+            </ul>
+        </div>
+        
+        <p>Администрация оставляет за собой право:</p>
+        <ul>
+            <li><i class="fas fa-check-circle"></i> Удалять любой контент без предупреждения</li>
+            <li><i class="fas fa-check-circle"></i> Блокировать пользователей, нарушающих правила</li>
+            <li><i class="fas fa-check-circle"></i> Сотрудничать с правоохранительными органами при необходимости</li>
+        </ul>
+        
+        <p>Если вы обнаружили контент, нарушающий закон или правила сайта, пожалуйста, свяжитесь с нами через страницу <a href="/contacts" style="color: #ff8c00;">Контакты</a>.</p>
+        
+        <h2><i class="fas fa-share-alt"></i> Передача данных третьим лицам</h2>
+        <p>Мы НЕ передаём ваши персональные данные третьим лицам. Вся информация хранится на наших защищённых серверах.</p>
+        
+        <h2><i class="fas fa-cookie-bite"></i> Cookies</h2>
+        <p>Сайт использует cookies для авторизации и хранения настроек. Вы можете отключить cookies в настройках браузера, но это может повлиять на работу сайта.</p>
+        
+        <h2><i class="fas fa-trash-alt"></i> Удаление данных</h2>
+        <p>Вы можете удалить свой аккаунт в любое время. Все ваши статьи и комментарии будут удалены без возможности восстановления.</p>
+        
+        <div class="last-updated">
+            <i class="fas fa-clock"></i> Последнее обновление: 09 апреля 2026 г.
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,500 @@
+{% extends "base.html" %}
+
+{% block content %}
+<style>
+    .create-container {
+        max-width: 900px;
+        margin: 0;
+    }
+    
+    .create-header {
+        margin-bottom: 2rem;
+    }
+    
+    .create-header h2 {
+        font-size: 2rem;
+        color: #fff;
+        border-left: 3px solid #ff8c00;
+        padding-left: 1rem;
+    }
+    
+    .create-card {
+        background: #0d0d0d;
+        border-radius: 24px;
+        padding: 2rem;
+        border: 1px solid rgba(255, 140, 0, 0.2);
+    }
+    
+    /* Вкладки выбора типа контента */
+    .content-tabs {
+        display: flex;
+        gap: 0.5rem;
+        margin-bottom: 2rem;
+        border-bottom: 1px solid rgba(255, 140, 0, 0.2);
+        padding-bottom: 0.5rem;
+    }
+    
+    .content-tab {
+        background: none;
+        border: none;
+        padding: 0.75rem 1.5rem;
+        color: #888;
+        font-size: 0.95rem;
+        cursor: pointer;
+        transition: all 0.2s;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .content-tab:hover {
+        color: #ff8c00;
+        background: rgba(255, 140, 0, 0.1);
+    }
+    
+    .content-tab.active {
+        color: #ff8c00;
+        background: rgba(255, 140, 0, 0.15);
+    }
+    
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+    
+    .form-group label {
+        display: block;
+        color: #aaa;
+        margin-bottom: 0.5rem;
+        font-weight: 600;
+    }
+    
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+        width: 100%;
+        padding: 0.8rem;
+        background: #1a1a1a;
+        border: 1px solid #333;
+        border-radius: 12px;
+        color: #fff;
+        font-size: 1rem;
+    }
+    
+    .form-group input:focus,
+    .form-group select:focus,
+    .form-group textarea:focus {
+        outline: none;
+        border-color: #ff8c00;
+    }
+    
+    .form-group textarea {
+        font-family: inherit;
+        resize: vertical;
+    }
+    
+    .form-group input[type="file"] {
+        padding: 0.5rem;
+        background: #1a1a1a;
+        cursor: pointer;
+    }
+    
+    .form-group input[type="file"]::file-selector-button {
+        background: #ff8c00;
+        color: #000;
+        border: none;
+        padding: 0.5rem 1rem;
+        border-radius: 8px;
+        cursor: pointer;
+        margin-right: 1rem;
+        font-weight: 600;
+    }
+    
+    .form-group input[type="file"]::file-selector-button:hover {
+        background: #ffa233;
+    }
+    
+    .preview-thumbnail {
+        margin-top: 1rem;
+        border-radius: 12px;
+        overflow: hidden;
+        max-width: 320px;
+    }
+    
+    .preview-thumbnail img {
+        width: 100%;
+        height: auto;
+        display: block;
+    }
+    
+    /* Quill редактор */
+    .ql-container {
+        min-height: 350px;
+        font-size: 16px;
+        background: #1a1a1a;
+    }
+    
+    .ql-toolbar {
+        background: #0d0d0d;
+        border: 1px solid #333;
+        border-radius: 12px 12px 0 0;
+    }
+    
+    .ql-container {
+        border: 1px solid #333;
+        border-top: none;
+        border-radius: 0 0 12px 12px;
+        color: #fff;
+    }
+    
+    .ql-editor {
+        color: #fff;
+        min-height: 350px;
+    }
+    
+    .ql-editor p {
+        color: #ddd;
+    }
+    
+    .ql-editor h1, .ql-editor h2, .ql-editor h3 {
+        color: #ff8c00;
+    }
+    
+    .ql-editor a {
+        color: #ff8c00;
+    }
+    
+    .ql-editor img {
+        max-width: 100%;
+        border-radius: 12px;
+    }
+    
+    .image-upload-area {
+        margin-top: 0.5rem;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        flex-wrap: wrap;
+    }
+    
+    .custom-upload-btn {
+        background: #ff8c00;
+        color: #000;
+        padding: 0.3rem 0.8rem;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        cursor: pointer;
+        border: none;
+        transition: all 0.2s;
+    }
+    
+    .custom-upload-btn:hover {
+        background: #ffa233;
+        transform: translateY(-2px);
+    }
+    
+    .checkbox-group {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .checkbox-group input {
+        width: auto;
+        transform: scale(1.2);
+    }
+    
+    .form-actions {
+        display: flex;
+        gap: 1rem;
+        margin-top: 2rem;
+    }
+    
+    .btn-submit {
+        background: #ff8c00;
+        color: #000;
+        padding: 0.8rem 1.5rem;
+        border: none;
+        border-radius: 12px;
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+    
+    .btn-submit:hover {
+        background: #ffa233;
+        transform: translateY(-2px);
+    }
+    
+    .btn-cancel {
+        background: #1a1a1a;
+        color: #aaa;
+        padding: 0.8rem 1.5rem;
+        border: 1px solid #333;
+        border-radius: 12px;
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s;
+        text-decoration: none;
+        display: inline-block;
+    }
+    
+    .btn-cancel:hover {
+        background: #2a2a2a;
+        color: #fff;
+    }
+    
+    @media (max-width: 768px) {
+        .create-card {
+            padding: 1.5rem;
+        }
+        .form-actions {
+            flex-direction: column;
+        }
+        .btn-submit, .btn-cancel {
+            text-align: center;
+        }
+        .content-tab {
+            padding: 0.5rem 1rem;
+            font-size: 0.85rem;
+        }
+    }
+</style>
+
+<div class="create-header">
+    <h2><i class="fas fa-plus-circle"></i> Создать</h2>
+</div>
+
+<div class="create-card">
+    <!-- Вкладки выбора типа контента -->
+    <div class="content-tabs">
+        <button class="content-tab active" onclick="switchContentType('article')">
+            <i class="fas fa-newspaper"></i> Статья
+        </button>
+        <button class="content-tab" onclick="switchContentType('video')">
+            <i class="fas fa-video"></i> Видео
+        </button>
+    </div>
+    
+    <!-- ФОРМА ДЛЯ СТАТЬИ -->
+    <div class="form-article">
+        <form method="post" id="articleForm" action="/create">
+            <div class="form-group">
+                <label><i class="fas fa-heading"></i> Заголовок</label>
+                <input type="text" name="title" required placeholder="Придумайте яркий заголовок">
+            </div>
+            
+            <div class="form-group">
+                <label><i class="fas fa-folder-open"></i> Категория</label>
+                <select name="category_id" required>
+                    <option value="">Выберите категорию</option>
+                    {% for cat in categories %}
+                    <option value="{{ cat.id }}">
+                        {% if cat.slug == 'lichnoe' %}👤
+                        {% elif cat.slug == 'puteshestviya' %}✈️
+                        {% elif cat.slug == 'tehnologii' %}💻
+                        {% elif cat.slug == 'yumor' %}😊
+                        {% elif cat.slug == 'istorii' %}📖
+                        {% elif cat.slug == 'sovety' %}💡
+                        {% else %}📁{% endif %}
+                        {{ cat.name }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label><i class="fas fa-newspaper"></i> Содержание</label>
+                <div id="editor" style="min-height: 350px;"></div>
+                <input type="hidden" name="content" id="content">
+                
+                <div class="image-upload-area">
+                    <span style="color:#888; font-size:0.8rem;"><i class="fas fa-image"></i> Загрузить картинку:</span>
+                    <input type="file" id="imageUpload" accept="image/*" style="display: none;">
+                    <button type="button" class="custom-upload-btn" onclick="document.getElementById('imageUpload').click()">
+                        <i class="fas fa-upload"></i> Выбрать файл
+                    </button>
+                    <span id="uploadStatus" style="color:#ff8c00; font-size:0.7rem;"></span>
+                </div>
+            </div>
+            
+            <div class="form-group checkbox-group">
+                <input type="checkbox" name="is_published" value="true" id="publishCheckbox">
+                <label for="publishCheckbox"><i class="fas fa-globe"></i> Опубликовать сразу (если не отмечено — сохранится как черновик)</label>
+            </div>
+            
+            <div class="form-actions">
+                <button type="submit" class="btn-submit">
+                    <i class="fas fa-paper-plane"></i> Опубликовать
+                </button>
+                <a href="/profile" class="btn-cancel">
+                    <i class="fas fa-times"></i> Отмена
+                </a>
+            </div>
+        </form>
+    </div>
+    
+    <!-- ФОРМА ДЛЯ ВИДЕО -->
+    <div class="form-video" style="display: none;">
+        <form method="post" id="videoForm" action="/create-video" enctype="multipart/form-data">
+            <div class="form-group">
+                <label><i class="fas fa-heading"></i> Название видео</label>
+                <input type="text" name="title" required placeholder="Придумайте название">
+            </div>
+            
+            <div class="form-group">
+                <label><i class="fas fa-align-left"></i> Описание (необязательно)</label>
+                <textarea name="description" rows="5" placeholder="Опишите, о чём видео..."></textarea>
+            </div>
+            
+            <div class="form-group">
+                <label><i class="fas fa-file-video"></i> Видеофайл</label>
+                <input type="file" name="video_file" accept="video/mp4,video/webm,video/quicktime,video/x-msvideo" required>
+                <small style="color: #666; display: block; margin-top: 0.3rem;">
+                    Поддерживаются: MP4, WebM, MOV, AVI. Максимальный размер: 200MB
+                </small>
+            </div>
+            
+            <!-- НОВОЕ ПОЛЕ: ЗАГРУЗКА ПРЕВЬЮ -->
+            <div class="form-group">
+                <label><i class="fas fa-image"></i> Превью (обложка видео)</label>
+                <input type="file" name="thumbnail" id="thumbnailInput" accept="image/jpeg,image/png,image/webp,image/gif">
+                <small style="color: #666; display: block; margin-top: 0.3rem;">
+                    Рекомендуемый размер: 1280x720 (16:9). Если не загрузить — будет стандартная обложка.
+                </small>
+                <div class="preview-thumbnail" id="thumbnailPreview" style="display: none;">
+                    <img id="thumbnailImg" src="" alt="Превью">
+                </div>
+            </div>
+            
+            <div class="form-group checkbox-group">
+                <input type="checkbox" name="is_published" value="true" checked>
+                <label><i class="fas fa-globe"></i> Опубликовать сразу</label>
+            </div>
+            
+            <div class="form-actions">
+                <button type="submit" class="btn-submit">
+                    <i class="fas fa-upload"></i> Загрузить видео
+                </button>
+                <a href="/profile" class="btn-cancel">
+                    <i class="fas fa-times"></i> Отмена
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    // Переключение между статьёй и видео
+    function switchContentType(type) {
+        const articleForm = document.querySelector('.form-article');
+        const videoForm = document.querySelector('.form-video');
+        const tabs = document.querySelectorAll('.content-tab');
+        
+        if (type === 'article') {
+            articleForm.style.display = 'block';
+            videoForm.style.display = 'none';
+            tabs[0].classList.add('active');
+            tabs[1].classList.remove('active');
+        } else {
+            articleForm.style.display = 'none';
+            videoForm.style.display = 'block';
+            tabs[0].classList.remove('active');
+            tabs[1].classList.add('active');
+        }
+    }
+    
+    // Предпросмотр загруженного превью
+    const thumbnailInput = document.getElementById('thumbnailInput');
+    const thumbnailPreview = document.getElementById('thumbnailPreview');
+    const thumbnailImg = document.getElementById('thumbnailImg');
+    
+    if (thumbnailInput) {
+        thumbnailInput.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    thumbnailImg.src = e.target.result;
+                    thumbnailPreview.style.display = 'block';
+                };
+                reader.readAsDataURL(file);
+            } else {
+                thumbnailPreview.style.display = 'none';
+            }
+        });
+    }
+    
+    // Инициализация Quill редактора
+    var quill = new Quill('#editor', {
+        theme: 'snow',
+        placeholder: 'Напишите вашу историю...',
+        modules: {
+            toolbar: [
+                ['bold', 'italic', 'underline', 'strike'],
+                ['blockquote', 'code-block'],
+                [{ 'header': 1 }, { 'header': 2 }],
+                [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+                [{ 'script': 'sub'}, { 'script': 'super' }],
+                [{ 'indent': '-1'}, { 'indent': '+1' }],
+                [{ 'direction': 'rtl' }],
+                [{ 'size': ['small', false, 'large', 'huge'] }],
+                [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
+                [{ 'color': [] }, { 'background': [] }],
+                [{ 'font': [] }],
+                [{ 'align': [] }],
+                ['clean'],
+                ['link', 'image', 'video']
+            ]
+        }
+    });
+    
+    // Загрузка картинок
+    const imageUpload = document.getElementById('imageUpload');
+    const uploadStatus = document.getElementById('uploadStatus');
+    
+    if (imageUpload) {
+        imageUpload.addEventListener('change', async function(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            
+            uploadStatus.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Загрузка...';
+            
+            const formData = new FormData();
+            formData.append('file', file);
+            
+            try {
+                const response = await fetch('/upload-image', {
+                    method: 'POST',
+                    body: formData
+                });
+                const data = await response.json();
+                
+                if (data.location) {
+                    const range = quill.getSelection();
+                    quill.insertEmbed(range.index, 'image', data.location);
+                    uploadStatus.innerHTML = '<i class="fas fa-check-circle"></i> Картинка загружена!';
+                    setTimeout(() => { uploadStatus.innerHTML = ''; }, 2000);
+                } else if (data.error) {
+                    uploadStatus.innerHTML = '<i class="fas fa-exclamation-triangle"></i> ' + data.error;
+                }
+            } catch (error) {
+                uploadStatus.innerHTML = '<i class="fas fa-times-circle"></i> Ошибка загрузки';
+            }
+            
+            imageUpload.value = '';
+        });
+    }
+    
+    // Перед отправкой формы — сохраняем HTML из редактора в скрытое поле
+    const form = document.getElementById('articleForm');
+    if (form) {
+        form.addEventListener('submit', function() {
+            const contentInput = document.getElementById('content');
+            contentInput.value = quill.root.innerHTML;
+        });
+    }
+</script>
+{% endblock %}

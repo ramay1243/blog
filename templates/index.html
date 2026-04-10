@@ -1,0 +1,756 @@
+{% extends "base.html" %}
+
+{% block content %}
+<style>
+
+.categories-filter {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.8rem;
+    margin-bottom: 2rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid rgba(255, 140, 0, 0.2);
+}
+
+.cat-tag {
+    padding: 0.4rem 1rem;
+    background: #1a1a1a;
+    border-radius: 20px;
+    text-decoration: none;
+    color: #aaa;
+    font-size: 0.85rem;
+    transition: all 0.2s;
+}
+
+.cat-tag:hover {
+    background: #ff8c00;
+    color: #000;
+    transform: translateY(-2px);
+}
+
+.cat-tag.active {
+    background: #ff8c00;
+    color: #000;
+}
+
+.cat-badge {
+    display: inline-block;
+    padding: 0.2rem 0.6rem;
+    background: rgba(255, 140, 0, 0.15);
+    border-radius: 12px;
+    font-size: 0.7rem;
+    color: #ff8c00;
+    margin-bottom: 0.5rem;
+}
+
+/* Левое меню */
+.layout {
+    display: flex;
+    gap: 2rem;
+    align-items: flex-start;
+}
+
+.left-menu {
+    width: 220px;
+    flex-shrink: 0;
+    position: sticky;
+    top: 2rem;
+    background: #0d0d0d;
+    border-radius: 20px;
+    border: 1px solid rgba(255, 140, 0, 0.15);
+    overflow: hidden;
+}
+
+.left-menu-item {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    padding: 0.8rem 1.2rem;
+    color: #aaa;
+    background: none;
+    border: none;
+    width: 100%;
+    text-align: left;
+    cursor: pointer;
+    transition: all 0.2s;
+    border-left: 3px solid transparent;
+    font-size: 1rem;
+}
+
+.left-menu-item:hover {
+    background: rgba(255, 140, 0, 0.1);
+    color: #ff8c00;
+}
+
+.left-menu-item.active {
+    background: rgba(255, 140, 0, 0.15);
+    color: #ff8c00;
+    border-left-color: #ff8c00;
+}
+
+/* Футер в левом меню */
+.menu-footer {
+    margin-top: 2rem;
+    padding-top: 0.5rem;
+    border-top: 1px solid rgba(255, 140, 0, 0.2);
+}
+
+.menu-footer-item {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    padding: 0.6rem 1.2rem;
+    color: #aaa;
+    font-size: 0.9rem;
+    text-decoration: none;
+    transition: all 0.2s;
+    border-radius: 12px;
+}
+
+.menu-footer-item:hover {
+    background: rgba(255, 140, 0, 0.1);
+    color: #ff8c00;
+}
+
+.menu-footer-copyright {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.6rem 1.2rem;
+    color: #444;
+    font-size: 0.7rem;
+    margin-top: 0.5rem;
+}
+
+.content-right {
+    flex: 1;
+    min-width: 0;
+}
+    
+.section-header {
+    margin-bottom: 2rem;
+    border-left: 3px solid #ff8c00;
+    padding-left: 1rem;
+}
+    
+.section-header h2 {
+    margin-bottom: 0.3rem;
+    font-size: 1.8rem;
+}
+    
+.section-header p {
+    color: #888;
+    font-size: 0.95rem;
+}
+    
+.articles-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+    margin-top: 1rem;
+}
+    
+.article-card {
+    background: #0d0d0d;
+    border-radius: 20px;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    border: 1px solid rgba(255, 140, 0, 0.15);
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    position: relative;
+}
+    
+.article-card:hover {
+    transform: translateY(-5px);
+    border-color: rgba(255, 140, 0, 0.4);
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
+}
+    
+.card-header {
+    padding: 1.5rem 1.5rem 0.5rem 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    padding-bottom: 1rem;
+}
+    
+.author-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #ff8c00, #ff6600);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    color: #000;
+    font-size: 1.2rem;
+    overflow: hidden;
+}
+
+.author-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+    
+.author-info {
+    flex: 1;
+}
+    
+.author-name {
+    font-weight: 600;
+    color: #fff;
+    font-size: 0.9rem;
+}
+
+.author-name a {
+    color: #fff;
+    text-decoration: none;
+}
+
+.author-name a:hover {
+    color: #ff8c00 !important;
+}
+    
+.post-date {
+    font-size: 0.7rem;
+    color: #888;
+}
+    
+.card-badge {
+    background: rgba(255, 140, 0, 0.15);
+    color: #ff8c00;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 0.7rem;
+    font-weight: 600;
+}
+    
+.card-content {
+    padding: 1.5rem;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+    
+.article-title {
+    font-size: 1.35rem;
+    font-weight: 700;
+    margin-bottom: 0.75rem;
+    line-height: 1.4;
+}
+    
+.article-title a {
+    color: #fff;
+    text-decoration: none;
+    transition: color 0.2s;
+}
+    
+.article-title a:hover {
+    color: #ff8c00;
+}
+    
+.article-excerpt {
+    color: #aaa;
+    line-height: 1.5;
+    margin-bottom: 1.5rem;
+    font-size: 0.9rem;
+    flex: 1;
+}
+    
+.card-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 1rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+    margin-top: auto;
+}
+    
+.read-more {
+    color: #ff8c00;
+    text-decoration: none;
+    font-size: 0.85rem;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: gap 0.2s;
+}
+    
+.read-more:hover {
+    gap: 0.8rem;
+}
+    
+.stats-mini {
+    display: flex;
+    gap: 0.8rem;
+    color: #666;
+    font-size: 0.75rem;
+}
+    
+.stats-mini span {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+    
+.empty-state {
+    text-align: center;
+    padding: 4rem;
+    background: #0d0d0d;
+    border-radius: 24px;
+    border: 1px dashed #ff8c00;
+}
+    
+.empty-state-icon {
+    font-size: 4rem;
+    margin-bottom: 1rem;
+}
+    
+.cta-section {
+    text-align: center;
+    margin-top: 4rem;
+    padding: 3rem;
+    background: linear-gradient(135deg, #0d0d0d 0%, #0a0a0a 100%);
+    border-radius: 24px;
+    border: 1px solid rgba(255, 140, 0, 0.2);
+}
+    
+.cta-section h3 {
+    margin-bottom: 0.75rem;
+    font-size: 1.5rem;
+}
+    
+.cta-section p {
+    color: #888;
+    margin-bottom: 1.5rem;
+}
+    
+@media (max-width: 992px) {
+    .layout {
+        flex-direction: column;
+    }
+    .left-menu {
+        width: 100%;
+        position: static;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0;
+    }
+    .left-menu-item {
+        flex: 1;
+        justify-content: center;
+    }
+}
+
+@media (max-width: 768px) {
+    .articles-grid { grid-template-columns: 1fr; }
+    .stats-bar { gap: 1.5rem; }
+    .card-header { padding: 1rem 1rem 0.5rem 1rem; }
+    .card-content { padding: 1rem; }
+    .article-title { font-size: 1.2rem; }
+    .left-menu {
+        flex-direction: column;
+    }
+    .left-menu-item {
+        justify-content: flex-start;
+    }
+}
+    
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+    
+.article-card {
+    animation: fadeInUp 0.4s ease forwards;
+    opacity: 0;
+}
+    
+.article-card:nth-child(1) { animation-delay: 0.05s; }
+.article-card:nth-child(2) { animation-delay: 0.1s; }
+.article-card:nth-child(3) { animation-delay: 0.15s; }
+.article-card:nth-child(4) { animation-delay: 0.2s; }
+.article-card:nth-child(5) { animation-delay: 0.25s; }
+.article-card:nth-child(6) { animation-delay: 0.3s; }
+
+.video-thumbnail-preview {
+    position: relative;
+    margin: -1.5rem -1.5rem 0 -1.5rem;
+    width: calc(100% + 3rem);
+    border-radius: 20px 20px 0 0 !important;
+}
+
+.article-card:hover .play-overlay {
+    transform: translate(-50%, -50%) scale(1.1);
+    background: #ff8c00;
+    transition: all 0.3s ease;
+}
+
+.play-overlay {
+    transition: all 0.3s ease;
+}
+
+/* Для видео в сетке */
+.articles-grid .article-card:has(.video-thumbnail-preview) {
+    padding-top: 0;
+}
+
+.video-player-inline {
+    position: relative;
+}
+
+.video-player-inline video {
+    display: block;
+    width: 100%;
+    background: #000;
+}
+
+/* Для карточек с видео убираем лишний паддинг сверху */
+.article-card:has(.video-player-inline) .card-header {
+    padding-top: 1rem !important;
+}
+
+/* Адаптивность для видео */
+@media (max-width: 768px) {
+    .video-player-inline video {
+        max-height: 250px;
+    }
+}
+
+</style>
+
+
+<div class="categories-filter">
+    <a href="/" class="cat-tag {% if not selected_category %}active{% endif %}">
+        <i class="fas fa-list"></i> Все
+    </a>
+    {% for cat in categories %}
+    <a href="/?category={{ cat.slug }}" class="cat-tag {% if selected_category and selected_category.id == cat.id %}active{% endif %}">
+        {% if cat.slug == 'lichnoe' %}<i class="fas fa-user-circle"></i>
+        {% elif cat.slug == 'puteshestviya' %}<i class="fas fa-plane"></i>
+        {% elif cat.slug == 'tehnologii' %}<i class="fas fa-laptop-code"></i>
+        {% elif cat.slug == 'yumor' %}<i class="fas fa-smile-wink"></i>
+        {% elif cat.slug == 'istorii' %}<i class="fas fa-book-open"></i>
+        {% elif cat.slug == 'sovety' %}<i class="fas fa-lightbulb"></i>
+        {% else %}<i class="fas fa-tag"></i>{% endif %}
+        {{ cat.name }}
+    </a>
+    {% endfor %}
+</div>
+
+<!-- Лента статей с левым меню -->
+<div class="layout">
+    <!-- Левое меню (кнопки) -->
+    <div class="left-menu">
+        <button class="left-menu-item active" data-feed="fresh">
+            <i class="fas fa-clock"></i> Свежее
+        </button>
+        <button class="left-menu-item" data-feed="popular">
+            <i class="fas fa-fire"></i> Популярное
+        </button>
+        {% if user %}
+        <button class="left-menu-item" data-feed="myfeed">
+            <i class="fas fa-rss"></i> Моя лента
+        </button>
+        {% endif %}
+        <!-- === ИЗМЕНЕНИЕ: Заменена ссылка на кнопку === -->
+        <button class="left-menu-item" data-feed="videos">
+            <i class="fas fa-video"></i> Видео
+        </button>
+        
+        <!-- Футер под меню -->
+        <div class="menu-footer">
+            <a href="/about" class="menu-footer-item">
+                <i class="fas fa-info-circle"></i> О сайте
+            </a>
+            <a href="/contacts" class="menu-footer-item">
+                <i class="fas fa-envelope"></i> Контакты
+            </a>
+            <a href="/privacy" class="menu-footer-item">
+                <i class="fas fa-lock"></i> Политика
+            </a>
+            <div class="menu-footer-copyright">
+                <i class="fas fa-copyright"></i> 2026 StoryBlog
+            </div>
+        </div>
+    </div>
+    
+    <!-- Правая часть: статьи -->
+    <div class="content-right">
+        <div class="section-header">
+            <h2><i class="fas fa-clock"></i> Последние истории</h2>
+            <p>Свежие публикации от авторов сообщества</p>
+        </div>
+
+        <div class="articles-grid" id="articlesGrid">
+            {% for article in articles %}
+            <div class="article-card">
+                <div class="card-header">
+                    <div class="author-avatar">
+                        {% if article.author_avatar and article.author_avatar != 'default.png' %}
+                        <img src="/static/avatars/{{ article.author_avatar }}" style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover;">
+                        {% else %}
+                        {{ article.author_name[0]|upper if article.author_name else 'U' }}
+                        {% endif %}
+                    </div>
+                    <div class="author-info">
+                        <div class="author-name">
+                            <a href="/user/{{ article.user_id }}"><i class="fas fa-user"></i> {{ article.author_name }}</a>
+                        </div>
+                        <div class="post-date">{{ article.created_at.strftime('%d %B %Y') }}</div>
+                    </div>
+                    {% if not article.is_published %}
+                    <div class="card-badge">Черновик</div>
+                    {% endif %}
+                </div>
+                
+                <div class="card-content">
+                    {% if article.category %}
+                    <div class="cat-badge">{{ article.category.icon }} {{ article.category.name }}</div>
+                    {% endif %}
+                    <h3 class="article-title">
+                        <a href="/article/{{ article.slug }}">{{ article.title }}</a>
+                    </h3>
+                    
+                    <div class="article-excerpt">
+                        {{ article.description[:140] }}{% if article.description|length > 140 %}...{% endif %}
+                    </div>
+                    
+                    <div class="card-footer">
+                        <a href="/article/{{ article.slug }}" class="read-more">
+                            Читать <i class="fas fa-arrow-right"></i>
+                        </a>
+                        <div class="stats-mini">
+                            <span><i class="fas fa-eye"></i> {{ article.views }}</span>
+                            <span><i class="fas fa-heart"></i> {{ article.likes }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% else %}
+            <div class="empty-state">
+                <div class="empty-state-icon">📭</div>
+                <h3>Пока нет историй</h3>
+                <p style="color: #888; margin: 1rem 0;">Будьте первым, кто поделится своей историей!</p>
+                {% if user %}
+                    <a href="/create" class="btn btn-primary">✍️ Написать историю</a>
+                {% else %}
+                    <a href="/register" class="btn btn-primary">🔐 Зарегистрироваться</a>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+
+<script>
+// ========== БЕСКОНЕЧНАЯ ПРОКРУТКА ==========
+let currentOffset = {{ articles|length }};
+let currentFeedIndex = '{% if feed == "popular" %}popular{% elif feed == "myfeed" %}myfeed{% else %}fresh{% endif %}';
+let isLoading = false;
+let hasMore = true;
+let currentCategory = '{% if selected_category %}{{ selected_category.slug }}{% endif %}';
+
+function escapeHtml(text) {
+    if (!text) return '';
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+
+// === ИЗМЕНЕНИЕ: Обновлена функция для поддержки видео ===
+function appendArticles(items) {
+    const grid = document.getElementById('articlesGrid');
+    
+    items.forEach(item => {
+        // Проверяем, видео это или статья
+        const isVideo = item.type === 'video' || item.video_url;
+        const linkUrl = isVideo ? `/video/${item.id}` : `/article/${item.slug}`;
+        const readText = isVideo ? 'Смотреть' : 'Читать';
+        const viewsIcon = isVideo ? 'fa-play' : 'fa-eye';
+        
+        // Для видео добавляем плеер ПОСЛЕ заголовка
+        const videoPlayerHtml = isVideo ? `
+            <div class="video-player-inline" style="margin: 1rem 0; border-radius: 12px; overflow: hidden; background: #000;">
+                <video controls style="width: 100%; max-height: 350px; display: block;" poster="${item.thumbnail_url || ''}">
+                    <source src="${item.video_url}" type="video/mp4">
+                    Ваш браузер не поддерживает видео.
+                </video>
+            </div>
+        ` : '';
+        
+        const itemHtml = `
+            <div class="article-card" style="animation: fadeInUp 0.4s ease forwards;">
+                <div class="card-header">
+                    <div class="author-avatar">
+                        ${item.author_avatar && item.author_avatar !== 'default.png' 
+                            ? `<img src="/static/avatars/${item.author_avatar}" style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover;">`
+                            : (item.author_name ? item.author_name[0].toUpperCase() : 'U')
+                        }
+                    </div>
+                    <div class="author-info">
+                        <div class="author-name">
+                            <a href="/user/${item.user_id}">${escapeHtml(item.author_name)}</a>
+                        </div>
+                        <div class="post-date">${new Date(item.created_at).toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' })}</div>
+                    </div>
+                    ${isVideo ? '<div class="card-badge" style="background: rgba(255, 0, 0, 0.15); color: #ff4444;"><i class="fas fa-video"></i> Видео</div>' : ''}
+                </div>
+                <div class="card-content">
+                    ${item.category ? `<div class="cat-badge">${escapeHtml(item.category.icon)} ${escapeHtml(item.category.name)}</div>` : ''}
+                    <h3 class="article-title">
+                        <a href="${linkUrl}">
+                            ${escapeHtml(item.title)}
+                        </a>
+                    </h3>
+                    
+                    ${videoPlayerHtml}
+                    
+                    <div class="article-excerpt">
+                        ${escapeHtml(item.description ? item.description.substring(0, 140) : '')}${item.description && item.description.length > 140 ? '...' : ''}
+                    </div>
+                    <div class="card-footer">
+                        <a href="${linkUrl}" class="read-more">
+                            ${readText} <i class="fas fa-arrow-right"></i>
+                        </a>
+                        <div class="stats-mini">
+                            <span><i class="fas ${viewsIcon}"></i> ${item.views || 0}</span>
+                            <span><i class="fas fa-heart"></i> ${item.likes || 0}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+        grid.insertAdjacentHTML('beforeend', itemHtml);
+    });
+}
+
+function resetPagination() {
+    currentOffset = {{ articles|length }};
+    hasMore = true;
+    isLoading = false;
+    
+    const endMessage = document.querySelector('.end-message');
+    if (endMessage) endMessage.remove();
+}
+
+function loadMoreArticles() {
+    if (isLoading || !hasMore) return;
+    
+    isLoading = true;
+    
+    let url = `/api/feed?type=${currentFeedIndex}&offset=${currentOffset}&limit=10`;
+    if (currentCategory) {
+        url += `&category=${currentCategory}`;
+    }
+    
+    fetch(url)
+        .then(response => response.json())
+        .then(data => {
+            // === ИЗМЕНЕНИЕ: Поддержка разных форматов ответа ===
+            if (data.items && data.items.length > 0) {
+                appendArticles(data.items);
+                currentOffset += data.items.length;
+            } else if (data.articles && data.articles.length > 0) {
+                appendArticles(data.articles);
+                currentOffset += data.articles.length;
+            }
+            hasMore = data.has_more;
+            
+            if (!hasMore) {
+                const endMessage = document.createElement('div');
+                endMessage.className = 'end-message';
+                endMessage.innerHTML = '<div style="text-align: center; padding: 2rem; color: #666;">✨ Вы просмотрели всё ✨</div>';
+                document.getElementById('articlesGrid').parentNode.appendChild(endMessage);
+            }
+        })
+        .catch(error => console.error('Ошибка загрузки:', error))
+        .finally(() => { isLoading = false; });
+}
+
+// Переключение вкладок
+document.querySelectorAll('.left-menu-item').forEach(btn => {
+    btn.addEventListener('click', function(e) {
+        e.preventDefault();
+        console.log('Клик по кнопке! feed:', this.dataset.feed);
+        document.querySelectorAll('.left-menu-item').forEach(b => b.classList.remove('active'));
+        this.classList.add('active');
+        
+        currentFeedIndex = this.dataset.feed;
+        currentCategory = '';
+        resetPagination();
+        
+        const grid = document.getElementById('articlesGrid');
+        const sectionHeader = document.querySelector('.section-header');
+        
+        grid.innerHTML = '<div style="text-align: center; padding: 2rem; color: #888;">Загрузка...</div>';
+        
+        fetch(`/api/feed?type=${currentFeedIndex}&offset=0&limit=10`)
+            .then(response => response.json())
+            .then(data => {
+                let title = '', desc = '';
+                if (currentFeedIndex === 'popular') {
+                    title = '<i class="fas fa-fire"></i> Популярные статьи';
+                    desc = 'Самые читаемые статьи на сайте';
+                } else if (currentFeedIndex === 'myfeed') {
+                    title = '<i class="fas fa-rss"></i> Моя лента';
+                    desc = 'Новые статьи от авторов, на которых вы подписаны';
+                } else if (currentFeedIndex === 'videos') {
+                    // === ИЗМЕНЕНИЕ: Заголовок для видео ===
+                    title = '<i class="fas fa-video"></i> Видео';
+                    desc = 'Видео от авторов сообщества';
+                } else {
+                    title = '<i class="fas fa-clock"></i> Последние истории';
+                    desc = 'Свежие публикации от авторов сообщества';
+                }
+                sectionHeader.innerHTML = `<h2>${title}</h2><p>${desc}</p>`;
+                
+                grid.innerHTML = '';
+                
+                // === ИЗМЕНЕНИЕ: Поддержка видео в ответе ===
+                const items = data.videos || data.articles || [];
+                if (items.length === 0) {
+                    const emptyMessage = currentFeedIndex === 'videos' ? 'Пока нет видео' : 'Нет статей';
+                    const emptyIcon = currentFeedIndex === 'videos' ? '🎬' : '📭';
+                    grid.innerHTML = `<div class="empty-state"><div class="empty-state-icon">${emptyIcon}</div><h3>${emptyMessage}</h3><p style="color: #888;">Пока нет контента в этой ленте</p></div>`;
+                } else {
+                    appendArticles(items);
+                    currentOffset = items.length;
+                    hasMore = data.has_more;
+                }
+            })
+            .catch(err => {
+                grid.innerHTML = '<div style="text-align: center; padding: 2rem; color: #ef4444;">Ошибка загрузки</div>';
+            });
+    });
+});
+
+// Скролл для бесконечной загрузки
+let scrollTimeout;
+window.addEventListener('scroll', function() {
+    if (scrollTimeout) clearTimeout(scrollTimeout);
+    scrollTimeout = setTimeout(() => {
+        const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+        const windowHeight = window.innerHeight;
+        const documentHeight = document.documentElement.scrollHeight;
+        
+        if (scrollTop + windowHeight >= documentHeight - 300) {
+            loadMoreArticles();
+        }
+    }, 100);
+});
+</script>
+{% endblock %}

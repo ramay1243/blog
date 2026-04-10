@@ -1,0 +1,544 @@
+{% extends "base.html" %}
+
+{% block content %}
+<style>
+    /* Стили статьи */
+    .article-container {
+        background: #0d0d0d;
+        border-radius: 24px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+        border: 1px solid rgba(255, 140, 0, 0.15);
+    }
+    
+    .article-header-top {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 1.5rem;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+    
+    .article-author-info {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+    
+    .article-author-avatar {
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        object-fit: cover;
+    }
+    
+    .article-author-name {
+        font-weight: 600;
+        color: #fff;
+        font-size: 1rem;
+    }
+    
+    .article-author-name a {
+        color: #fff;
+        text-decoration: none;
+    }
+    
+    .article-author-name a:hover {
+        color: #ff8c00;
+    }
+    
+    .subscribe-btn {
+        background: rgba(255, 140, 0, 0.15);
+        color: #ff8c00;
+        border: 1px solid rgba(255, 140, 0, 0.3);
+        padding: 0.5rem 1.2rem;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .subscribe-btn:hover {
+        background: #ff8c00;
+        color: #000;
+    }
+    
+    .subscribe-btn.subscribed {
+        background: #ff8c00;
+        color: #000;
+    }
+    
+    .article-title-page {
+        font-size: 2.5rem;
+        color: #fff;
+        margin-bottom: 1rem;
+        border-left: 3px solid #ff8c00;
+        padding-left: 1rem;
+    }
+    
+    .article-content {
+        color: #ddd;
+        line-height: 1.8;
+        font-size: 1.05rem;
+    }
+    
+    .article-description-box {
+        margin-top: 2rem;
+        padding-top: 1.5rem;
+        border-top: 1px solid rgba(255, 255, 255, 0.05);
+    }
+    
+    .article-stats-bar {
+        display: flex;
+        gap: 1.5rem;
+        margin-top: 1.5rem;
+        padding-top: 1.5rem;
+        border-top: 1px solid rgba(255, 255, 255, 0.05);
+        color: #888;
+        font-size: 0.85rem;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
+    }
+    
+    .article-stats-left {
+        display: flex;
+        gap: 1.5rem;
+    }
+    
+    .article-stats-right {
+        display: flex;
+        gap: 1rem;
+    }
+    
+    .like-section {
+        margin: 2rem 0;
+        padding: 1rem;
+        background: #0a0a0a;
+        border-radius: 16px;
+        display: flex;
+        gap: 1rem;
+        align-items: center;
+        flex-wrap: wrap;
+    }
+    
+    .comments-section {
+        margin-top: 3rem;
+    }
+    
+    .comment {
+        background: #0a0a0a;
+        padding: 1rem;
+        border-radius: 16px;
+        margin-bottom: 1rem;
+        border: 1px solid rgba(255, 140, 0, 0.1);
+    }
+    
+    .comment-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        margin-bottom: 0.5rem;
+    }
+    
+    .comment-author {
+        font-weight: 600;
+        color: #ff8c00;
+    }
+    
+    .comment-text {
+        color: #aaa;
+        line-height: 1.5;
+    }
+    
+    .comment-date {
+        font-size: 0.7rem;
+        color: #666;
+        margin-top: 0.5rem;
+    }
+    
+    .comment-actions {
+        display: flex;
+        gap: 0.5rem;
+        align-items: center;
+    }
+    
+    .reply-btn {
+        background: none;
+        border: none;
+        color: #ff8c00;
+        font-size: 0.7rem;
+        cursor: pointer;
+        padding: 0.2rem 0.5rem;
+        border-radius: 15px;
+        transition: all 0.2s;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.3rem;
+    }
+    
+    .reply-btn:hover {
+        background: rgba(255, 140, 0, 0.2);
+        transform: translateY(-1px);
+    }
+    
+    .comment-delete-btn {
+        background: none;
+        border: none;
+        color: #ef4444;
+        cursor: pointer;
+        font-size: 0.7rem;
+        padding: 0.2rem 0.5rem;
+        border-radius: 15px;
+        transition: all 0.2s;
+    }
+    
+    .comment-delete-btn:hover {
+        background: rgba(239, 68, 68, 0.2);
+    }
+    
+    @media (max-width: 768px) {
+        .hero { padding: 1.5rem 1rem; min-height: 300px; }
+        .hero h1 { font-size: 1.8rem; }
+        .article-title-page { font-size: 1.8rem; }
+        .article-container { padding: 1.5rem; }
+        .article-stats-bar {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 0.5rem;
+        }
+        .like-section { flex-direction: column; }
+        .comment-header {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+    }
+</style>
+
+
+<!-- Статья -->
+<div class="article-container">
+    <!-- Автор и кнопка подписки -->
+    <div class="article-header-top">
+        <div class="article-author-info">
+            {% if article.author_avatar and article.author_avatar != 'default.png' %}
+            <img src="/static/avatars/{{ article.author_avatar }}" class="article-author-avatar" alt="{{ article.author_name }}">
+            {% else %}
+            <div style="width: 48px; height: 48px; background: #ff8c00; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #000; font-weight: bold; font-size: 1.2rem;">
+                {{ article.author_name[0]|upper if article.author_name else 'U' }}
+            </div>
+            {% endif %}
+            <div class="article-author-name">
+                <a href="/user/{{ article.user_id }}"><i class="fas fa-user"></i> {{ article.author_name }}</a>
+            </div>
+        </div>
+        
+        {% if user and user.id != article.user_id %}
+        <form method="post" action="/subscribe/{{ article.user_id }}" style="display: inline;">
+            <button type="submit" class="subscribe-btn {% if is_subscribed %}subscribed{% endif %}">
+                <i class="fas fa-bell"></i> 
+                {% if is_subscribed %}Вы подписаны{% else %}Подписаться{% endif %}
+            </button>
+        </form>
+        {% endif %}
+    </div>
+    
+    <h1 class="article-title-page">{{ article.title }}</h1>
+    
+    <div class="article-content">
+        {{ article.content_html|safe }}
+    </div>
+    
+    <!-- Статистика (дата, просмотры, лайки) ПОД ОПИСАНИЕМ -->
+    <div class="article-stats-bar">
+        <div class="article-stats-left">
+            <span><i class="fas fa-calendar-alt"></i> {{ article.created_at.strftime('%d %B %Y') }}</span>
+        </div>
+        <div class="article-stats-right">
+            <span><i class="fas fa-eye"></i> {{ article.views }} просмотров</span>
+            <span><i class="fas fa-heart"></i> {{ article.likes }} лайков</span>
+        </div>
+    </div>
+</div>
+
+<!-- Лайки и закладки -->
+<div class="like-section">
+    <form method="post" action="/like/{{ article.id }}" style="display: inline;">
+        <button type="submit" class="btn {% if user_liked %}btn-primary{% else %}btn-outline{% endif %}">
+            <i class="fas fa-heart"></i> {% if user_liked %}Убрать лайк{% else %}Лайкнуть{% endif %} ({{ article.likes }})
+        </button>
+    </form>
+    
+    <form method="post" action="/bookmark/{{ article.id }}" style="display: inline;">
+        <button type="submit" class="btn btn-outline">
+            <i class="fas fa-bookmark"></i> В закладки
+        </button>
+    </form>
+    <!-- КНОПКА ЖАЛОБЫ -->
+<button class="btn btn-outline" onclick="showComplaintForm('article', {{ article.id }})" style="color: #ef4444; border-color: rgba(239, 68, 68, 0.3);">
+    <i class="fas fa-flag"></i> Пожаловаться
+</button>
+</div>
+
+<!-- Комментарии -->
+<div class="comments-section">
+    <h3><i class="fas fa-comments"></i> Комментарии ({{ comments|length }})</h3>
+    
+    {% if user %}
+    <form method="post" action="/comment/{{ article.id }}" style="margin: 1rem 0;">
+        <textarea name="text" id="commentText" rows="3" placeholder="Напишите комментарий... (используйте @username для упоминания или нажмите 'Ответить')" required style="width: 100%; background: #0a0a0a; border: 1px solid #333; color: #fff; padding: 0.75rem; border-radius: 12px;"></textarea>
+        <button type="submit" class="btn btn-primary" style="margin-top: 0.5rem;">Отправить</button>
+    </form>
+    {% else %}
+    <p><a href="/login" style="color: #ff8c00;">Войдите</a>, чтобы оставить комментарий</p>
+    {% endif %}
+    
+    {% for comment in comments %}
+    <div class="comment" id="comment-{{ comment.id }}">
+        <div class="comment-header">
+            <div class="comment-author">{{ comment.author_name }}</div>
+            <div class="comment-actions">
+                {% if user and user.id == comment.user_id %}
+                <button class="comment-delete-btn" onclick="deleteComment({{ comment.id }})"><i class="fas fa-trash-alt"></i> Удалить</button>
+                {% endif %}
+                <button class="reply-btn" onclick="replyToUser('{{ comment.author_name }}')"><i class="fas fa-reply"></i> Ответить</button>
+            </div>
+        </div>
+        <div class="comment-text">{{ comment.text }}</div>
+        <div class="comment-date">{{ comment.created_at.strftime('%d.%m.%Y %H:%M') }}</div>
+    </div>
+    {% endfor %}
+</div>
+
+<script>
+    // Функция ответа на комментарий
+    function replyToUser(username) {
+        const textarea = document.getElementById('commentText');
+        if (!textarea) return;
+        
+        let currentText = textarea.value;
+        
+        if (currentText.length > 0 && !currentText.endsWith(' ') && !currentText.endsWith('\n')) {
+            currentText += ' ';
+        }
+        
+        textarea.value = currentText + `@${username} `;
+        textarea.focus();
+        
+        const len = textarea.value.length;
+        textarea.setSelectionRange(len, len);
+        
+        textarea.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+    
+    // Удаление комментария
+    function deleteComment(commentId) {
+        if (confirm('Вы уверены, что хотите удалить этот комментарий?')) {
+            fetch(`/comment/delete/${commentId}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    const commentElement = document.getElementById(`comment-${commentId}`);
+                    if (commentElement) {
+                        commentElement.remove();
+                    }
+                    const commentsCount = document.querySelector('.comments-section h3');
+                    if (commentsCount) {
+                        const currentCount = parseInt(commentsCount.textContent.match(/\d+/)[0]);
+                        commentsCount.innerHTML = `<i class="fas fa-comments"></i> Комментарии (${currentCount - 1})`;
+                    }
+                } else {
+                    alert('Ошибка: ' + data.error);
+                }
+            })
+            .catch(err => {
+                alert('Ошибка при удалении комментария');
+            });
+        }
+    }
+    
+    // Автоподсказка для @mention
+    const commentTextarea = document.getElementById('commentText');
+    if (commentTextarea) {
+        commentTextarea.addEventListener('input', function(e) {
+            const text = e.target.value;
+            const cursorPos = e.target.selectionStart;
+            
+            const textBeforeCursor = text.substring(0, cursorPos);
+            const lastAtIndex = textBeforeCursor.lastIndexOf('@');
+            
+            if (lastAtIndex !== -1) {
+                const afterAt = textBeforeCursor.substring(lastAtIndex + 1);
+                if (afterAt.match(/^[a-zA-Z0-9_а-яА-Я]*$/)) {
+                    searchUsers(afterAt);
+                } else {
+                    hideMentionSuggestions();
+                }
+            } else {
+                hideMentionSuggestions();
+            }
+        });
+        
+        function searchUsers(query) {
+            hideMentionSuggestions();
+            if (query.length < 1) return;
+            
+            fetch(`/api/users/search?q=${encodeURIComponent(query)}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.users && data.users.length > 0) {
+                        showMentionSuggestions(data.users);
+                    }
+                });
+        }
+        
+        function showMentionSuggestions(users) {
+            let suggestionBox = document.getElementById('mention-suggestions');
+            if (!suggestionBox) {
+                suggestionBox = document.createElement('div');
+                suggestionBox.id = 'mention-suggestions';
+                suggestionBox.style.cssText = `
+                    position: absolute;
+                    background: #1a1a1a;
+                    border: 1px solid #ff8c00;
+                    border-radius: 8px;
+                    max-height: 200px;
+                    overflow-y: auto;
+                    z-index: 1000;
+                    min-width: 180px;
+                    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+                `;
+                document.body.appendChild(suggestionBox);
+            }
+            
+            suggestionBox.innerHTML = users.map(user => `
+                <div class="mention-suggestion" data-username="${user.username}" style="
+                    padding: 0.6rem 1rem;
+                    cursor: pointer;
+                    color: #fff;
+                    transition: all 0.2s;
+                    border-bottom: 1px solid #333;
+                ">
+                    <span style="color: #ff8c00; font-weight: bold;">@${user.username}</span>
+                    <span style="font-size: 0.7rem; color: #888; margin-left: 0.5rem;">${user.email}</span>
+                </div>
+            `).join('');
+            
+            const textarea = commentTextarea;
+            const rect = textarea.getBoundingClientRect();
+            suggestionBox.style.top = `${rect.bottom + window.scrollY + 5}px`;
+            suggestionBox.style.left = `${rect.left + window.scrollX}px`;
+            suggestionBox.style.display = 'block';
+            
+            document.querySelectorAll('.mention-suggestion').forEach(el => {
+                el.addEventListener('click', function() {
+                    insertMention(this.dataset.username);
+                });
+                el.addEventListener('mouseenter', function() {
+                    this.style.background = '#ff8c00';
+                    this.style.color = '#000';
+                    this.querySelector('span:first-child').style.color = '#000';
+                });
+                el.addEventListener('mouseleave', function() {
+                    this.style.background = '';
+                    this.style.color = '';
+                    this.querySelector('span:first-child').style.color = '#ff8c00';
+                });
+            });
+        }
+        
+        function insertMention(username) {
+            const textarea = commentTextarea;
+            const cursorPos = textarea.selectionStart;
+            const text = textarea.value;
+            
+            let startPos = cursorPos - 1;
+            while (startPos >= 0 && text[startPos] !== '@') {
+                startPos--;
+            }
+            if (startPos < 0) startPos = cursorPos;
+            
+            const before = text.substring(0, startPos);
+            const after = text.substring(cursorPos);
+            const newText = before + `@${username} ` + after;
+            
+            textarea.value = newText;
+            textarea.focus();
+            const newCursorPos = startPos + username.length + 2;
+            textarea.setSelectionRange(newCursorPos, newCursorPos);
+            
+            hideMentionSuggestions();
+        }
+        
+        function hideMentionSuggestions() {
+            const box = document.getElementById('mention-suggestions');
+            if (box) {
+                box.style.display = 'none';
+            }
+        }
+        
+        document.addEventListener('click', function(e) {
+            if (!e.target.closest('#mention-suggestions') && e.target !== commentTextarea) {
+                hideMentionSuggestions();
+            }
+        });
+    }
+</script>
+
+<!-- Модальное окно жалобы -->
+<div id="complaintModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 9999; align-items: center; justify-content: center;">
+    <div style="background: #1a1a1a; border-radius: 16px; padding: 2rem; max-width: 500px; width: 90%; border: 1px solid #ff8c00;">
+        <h3 style="color: #fff; margin-bottom: 1rem;"><i class="fas fa-flag" style="color: #ef4444;"></i> Пожаловаться на материал</h3>
+        
+        <form method="post" id="complaintForm">
+            <textarea name="reason" rows="5" placeholder="Опишите причину жалобы..." required style="width: 100%; background: #0a0a0a; border: 1px solid #333; color: #fff; padding: 0.75rem; border-radius: 12px; margin-bottom: 1rem;"></textarea>
+            
+            <div style="display: flex; gap: 1rem; justify-content: flex-end;">
+                <button type="button" class="btn btn-outline" onclick="hideComplaintForm()" style="background: #1a1a1a;">Отмена</button>
+                <button type="submit" class="btn btn-primary" style="background: #ef4444;">Отправить жалобу</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    function showComplaintForm(type, id) {
+        const modal = document.getElementById('complaintModal');
+        const form = document.getElementById('complaintForm');
+        form.action = `/complaint/${type}/${id}`;
+        modal.style.display = 'flex';
+    }
+    
+    function hideComplaintForm() {
+        document.getElementById('complaintModal').style.display = 'none';
+    }
+    
+    // Закрытие по клику вне окна
+    document.getElementById('complaintModal').addEventListener('click', function(e) {
+        if (e.target === this) {
+            hideComplaintForm();
+        }
+    });
+    
+    // Показать сообщение об успехе
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('complaint') === 'success') {
+        alert('✅ Жалоба отправлена. Спасибо!');
+        window.history.replaceState({}, document.title, window.location.pathname);
+    }
+</script>
+
+{% endblock %}

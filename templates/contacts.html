@@ -1,0 +1,154 @@
+{% extends "base.html" %}
+
+{% block content %}
+<style>
+    .contacts-container {
+        width: 100%;
+        margin: 0;
+    }
+    
+    .contacts-header {
+        margin-bottom: 2rem;
+        border-left: 3px solid #ff8c00;
+        padding-left: 1rem;
+    }
+    
+    .contacts-header h1 {
+        font-size: 2rem;
+        color: #fff;
+    }
+    
+    .contacts-card {
+        background: #0d0d0d;
+        border-radius: 24px;
+        padding: 2rem;
+        border: 1px solid rgba(255, 140, 0, 0.2);
+        width: 100%;
+    }
+    
+    .contact-item {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        padding: 1rem 0;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        flex-wrap: wrap;
+    }
+    
+    .contact-item:last-child {
+        border-bottom: none;
+    }
+    
+    .contact-icon {
+        width: 50px;
+        height: 50px;
+        background: rgba(255, 140, 0, 0.15);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        color: #ff8c00;
+        flex-shrink: 0;
+    }
+    
+    .contact-info h3 {
+        color: #fff;
+        font-size: 1rem;
+        margin-bottom: 0.2rem;
+    }
+    
+    .contact-info p {
+        color: #888;
+        font-size: 0.85rem;
+    }
+    
+    .contact-info a {
+        color: #ff8c00;
+        text-decoration: none;
+    }
+    
+    .contact-info a:hover {
+        text-decoration: underline;
+    }
+    
+    .social-grid {
+        display: flex;
+        gap: 1rem;
+        margin-top: 1.5rem;
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+    
+    .social-link {
+        width: 45px;
+        height: 45px;
+        background: #1a1a1a;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.3rem;
+        color: #888;
+        transition: all 0.2s;
+    }
+    
+    .social-link:hover {
+        background: #ff8c00;
+        color: #000;
+        transform: translateY(-3px);
+    }
+    
+    @media (max-width: 768px) {
+        .contact-item {
+            flex-direction: column;
+            text-align: center;
+        }
+    }
+</style>
+
+<div class="contacts-container">
+    <div class="contacts-header">
+        <h1><i class="fas fa-envelope"></i> Контакты</h1>
+    </div>
+    
+    <div class="contacts-card">
+        <div class="contact-item">
+            <div class="contact-icon">
+                <i class="fas fa-envelope"></i>
+            </div>
+            <div class="contact-info">
+                <h3>Email</h3>
+                <p><a href="mailto:support@storyblog.ru">support@storyblog.ru</a></p>
+            </div>
+        </div>
+        
+        <div class="contact-item">
+            <div class="contact-icon">
+                <i class="fab fa-telegram"></i>
+            </div>
+            <div class="contact-info">
+                <h3>Telegram</h3>
+                <p><a href="#">@storyblog_support</a></p>
+            </div>
+        </div>
+        
+        <div class="contact-item">
+            <div class="contact-icon">
+                <i class="fab fa-vk"></i>
+            </div>
+            <div class="contact-info">
+                <h3>ВКонтакте</h3>
+                <p><a href="#">vk.com/storyblog</a></p>
+            </div>
+        </div>
+        
+        <div class="social-grid">
+            <a href="#" class="social-link"><i class="fab fa-telegram"></i></a>
+            <a href="#" class="social-link"><i class="fab fa-vk"></i></a>
+            <a href="#" class="social-link"><i class="fab fa-youtube"></i></a>
+            <a href="#" class="social-link"><i class="fab fa-github"></i></a>
+        </div>
+    </div>
+</div>
+{% endblock %}

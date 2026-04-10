@@ -1,0 +1,260 @@
+{% extends "base.html" %}
+
+{% block content %}
+<style>
+    .bookmarks-container {
+        width: 100%;
+        margin: 0;
+    }
+    
+    .bookmarks-header {
+        margin-bottom: 2rem;
+        border-left: 3px solid #ff8c00;
+        padding-left: 1rem;
+    }
+    
+    .bookmarks-header h1 {
+        font-size: 2rem;
+        color: #fff;
+    }
+    
+    .bookmarks-header p {
+        color: #888;
+        margin-top: 0.3rem;
+    }
+    
+    .bookmarks-stats {
+        display: flex;
+        gap: 2rem;
+        margin-bottom: 2rem;
+        color: #888;
+        font-size: 0.9rem;
+    }
+    
+    .bookmarks-grid {
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+    }
+    
+    .bookmark-item {
+        background: #0d0d0d;
+        border-radius: 16px;
+        padding: 1.5rem;
+        border: 1px solid rgba(255, 140, 0, 0.15);
+        display: flex;
+        gap: 1.5rem;
+        align-items: flex-start;
+        transition: all 0.2s;
+    }
+    
+    .bookmark-item:hover {
+        border-color: rgba(255, 140, 0, 0.4);
+    }
+    
+    .bookmark-thumbnail {
+        width: 160px;
+        height: 90px;
+        border-radius: 8px;
+        overflow: hidden;
+        background: #1a1a1a;
+        flex-shrink: 0;
+    }
+    
+    .bookmark-thumbnail img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+    
+    .bookmark-thumbnail .video-icon {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #000;
+        color: #ff8c00;
+        font-size: 2rem;
+    }
+    
+    .bookmark-content {
+        flex: 1;
+    }
+    
+    .bookmark-type {
+        display: inline-block;
+        padding: 0.2rem 0.6rem;
+        background: rgba(255, 140, 0, 0.15);
+        border-radius: 12px;
+        font-size: 0.7rem;
+        color: #ff8c00;
+        margin-bottom: 0.5rem;
+    }
+    
+    .bookmark-type.video {
+        background: rgba(255, 0, 0, 0.15);
+        color: #ff4444;
+    }
+    
+    .bookmark-title {
+        font-size: 1.2rem;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+    }
+    
+    .bookmark-title a {
+        color: #fff;
+        text-decoration: none;
+    }
+    
+    .bookmark-title a:hover {
+        color: #ff8c00;
+    }
+    
+    .bookmark-description {
+        color: #aaa;
+        font-size: 0.85rem;
+        line-height: 1.5;
+        margin-bottom: 0.75rem;
+    }
+    
+    .bookmark-meta {
+        display: flex;
+        gap: 1rem;
+        font-size: 0.75rem;
+        color: #666;
+        flex-wrap: wrap;
+        align-items: center;
+    }
+    
+    .bookmark-actions {
+        display: flex;
+        gap: 1rem;
+        margin-left: auto;
+    }
+    
+    .delete-bookmark-btn {
+        background: none;
+        border: none;
+        color: #ef4444;
+        cursor: pointer;
+        font-size: 0.75rem;
+        padding: 0.3rem 0.8rem;
+        border-radius: 15px;
+        transition: all 0.2s;
+    }
+    
+    .delete-bookmark-btn:hover {
+        background: rgba(239, 68, 68, 0.2);
+    }
+    
+    .empty-state {
+        text-align: center;
+        padding: 4rem;
+        background: #0d0d0d;
+        border-radius: 24px;
+        border: 1px dashed #ff8c00;
+    }
+    
+    @media (max-width: 768px) {
+        .bookmark-item {
+            flex-direction: column;
+        }
+        .bookmark-thumbnail {
+            width: 100%;
+            height: 160px;
+        }
+    }
+</style>
+
+<div class="bookmarks-container">
+    <div class="bookmarks-header">
+        <h1><i class="fas fa-bookmark"></i> Закладки</h1>
+        <p>Здесь собраны все статьи и видео, которые вы добавили в закладки</p>
+    </div>
+    
+    <div class="bookmarks-stats">
+        <span><i class="fas fa-newspaper"></i> {{ articles_count }} статей</span>
+        <span><i class="fas fa-video"></i> {{ videos_count }} видео</span>
+        <span><i class="fas fa-list"></i> Всего: {{ items|length }}</span>
+    </div>
+    
+    <div class="bookmarks-grid">
+        {% for item in items %}
+        <div class="bookmark-item">
+            <!-- Превью -->
+            <div class="bookmark-thumbnail">
+                {% if item.item_type == 'video' %}
+                    {% if item.thumbnail_url %}
+                    <img src="{{ item.thumbnail_url }}" alt="{{ item.title }}">
+                    {% else %}
+                    <div class="video-icon">
+                        <i class="fas fa-play-circle"></i>
+                    </div>
+                    {% endif %}
+                {% else %}
+                    <div style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, #1a1a1a, #0d0d0d);">
+                        <i class="fas fa-newspaper" style="font-size: 2rem; color: #ff8c00; opacity: 0.5;"></i>
+                    </div>
+                {% endif %}
+            </div>
+            
+            <!-- Контент -->
+            <div class="bookmark-content">
+                <span class="bookmark-type {% if item.item_type == 'video' %}video{% endif %}">
+                    {% if item.item_type == 'video' %}
+                    <i class="fas fa-video"></i> Видео
+                    {% else %}
+                    {{ item.category.icon if item.category else '📄' }} {{ item.category.name if item.category else 'Статья' }}
+                    {% endif %}
+                </span>
+                
+                <h3 class="bookmark-title">
+                    <a href="/{{ 'video' if item.item_type == 'video' else 'article' }}/{{ item.id if item.item_type == 'video' else item.slug }}">
+                        {{ item.title }}
+                    </a>
+                </h3>
+                
+                {% if item.description %}
+                <div class="bookmark-description">
+                    {{ item.description[:120] }}{% if item.description|length > 120 %}...{% endif %}
+                </div>
+                {% endif %}
+                
+                <div class="bookmark-meta">
+                    <span><i class="fas fa-user"></i> {{ item.author_name }}</span>
+                    <span><i class="fas fa-calendar-alt"></i> {{ item.created_at.strftime('%d.%m.%Y') }}</span>
+                    {% if item.item_type == 'video' %}
+                    <span><i class="fas fa-play"></i> {{ item.views }}</span>
+                    {% else %}
+                    <span><i class="fas fa-eye"></i> {{ item.views }}</span>
+                    {% endif %}
+                    <span><i class="fas fa-heart"></i> {{ item.likes }}</span>
+                    <span style="color: #555;"><i class="fas fa-bookmark"></i> {{ item.bookmarked_at.strftime('%d.%m.%Y') }}</span>
+                    
+                    <div class="bookmark-actions">
+                        <form method="post" action="/{% if item.item_type == 'video' %}video-bookmark{% else %}bookmark{% endif %}/{{ item.id }}" style="display: inline;">
+                            <button type="submit" class="delete-bookmark-btn">
+                                <i class="fas fa-trash-alt"></i> Удалить
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% else %}
+        <div class="empty-state">
+            <div class="empty-state-icon">
+                <i class="fas fa-bookmark" style="font-size: 4rem; color: #666;"></i>
+            </div>
+            <h3>Нет закладок</h3>
+            <p style="color: #888;">Добавляйте статьи и видео в закладки, чтобы вернуться к ним позже</p>
+            <a href="/" class="btn btn-primary" style="margin-top: 1rem;">
+                <i class="fas fa-home"></i> На главную
+            </a>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

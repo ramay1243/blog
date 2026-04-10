@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+
+{% block content %}
+<style>
+    .about-container {
+        width: 100%;
+        margin: 0;
+    }
+    
+    .about-header {
+        margin-bottom: 2rem;
+        border-left: 3px solid #ff8c00;
+        padding-left: 1rem;
+    }
+    
+    .about-header h1 {
+        font-size: 2rem;
+        color: #fff;
+    }
+    
+    .about-card {
+        background: #0d0d0d;
+        border-radius: 24px;
+        padding: 2rem;
+        border: 1px solid rgba(255, 140, 0, 0.2);
+        width: 100%;
+    }
+    
+    .about-card h2 {
+        color: #ff8c00;
+        font-size: 1.5rem;
+        margin-bottom: 1rem;
+    }
+    
+    .about-card p {
+        color: #aaa;
+        line-height: 1.6;
+        margin-bottom: 1rem;
+    }
+    
+    .about-card ul {
+        list-style: none;
+        padding: 0;
+    }
+    
+    .about-card li {
+        color: #aaa;
+        margin-bottom: 0.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .about-card li i {
+        color: #ff8c00;
+        width: 24px;
+    }
+</style>
+
+<div class="about-container">
+    <div class="about-header">
+        <h1><i class="fas fa-info-circle"></i> О сайте</h1>
+    </div>
+    
+    <div class="about-card">
+        <h2><i class="fas fa-book-open"></i> StoryBlog</h2>
+        <p>StoryBlog — это платформа для настоящих авторов, где каждый может поделиться своей историей, найти единомышленников и получить обратную связь.</p>
+        
+        <h2><i class="fas fa-star"></i> Наша миссия</h2>
+        <p>Мы создаём пространство, где каждый голос важен. Здесь нет цензуры и ограничений — только искренние истории и уважительное общение.</p>
+        
+        <h2><i class="fas fa-crown"></i> Почему мы?</h2>
+        <ul>
+            <li><i class="fas fa-check-circle"></i> Простая и удобная платформа</li>
+            <li><i class="fas fa-check-circle"></i> Поддержка авторов и читателей</li>
+            <li><i class="fas fa-check-circle"></i> Безопасность и конфиденциальность</li>
+            <li><i class="fas fa-check-circle"></i> Бесплатно навсегда</li>
+        </ul>
+    </div>
+</div>
+{% endblock %}
