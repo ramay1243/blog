@@ -1419,13 +1419,17 @@ function initHeroSlider() {
         track.style.cursor = 'grab';
         
         const diff = currentTranslate + (currentIndex * getSlideWidth());
-        const threshold = getSlideWidth() * 0.2;
+        const threshold = getSlideWidth() * 0.2; // 20% ширины слайда
+        
         track.style.transition = 'transform 0.3s ease-in-out';
         
         if (Math.abs(diff) > threshold) {
+            // Был свайп — перелистываем и ОТМЕНЯЕМ всплытие события
             diff > 0 ? prevSlide() : nextSlide();
-            e.preventDefault();
+            e.stopPropagation();  // ← ОСТАНАВЛИВАЕМ всплытие
+            e.preventDefault();   // ← ОТМЕНЯЕМ действие по умолчанию
         } else {
+            // Был просто клик без свайпа — возвращаем слайд, клик сработает сам
             goToSlide(currentIndex);
         }
         startAutoSlide();
@@ -1459,14 +1463,16 @@ function initHeroSlider() {
         
         const diff = currentTranslate + (currentIndex * getSlideWidth());
         const threshold = getSlideWidth() * 0.2;
+        
         track.style.transition = 'transform 0.3s ease-in-out';
         
         if (Math.abs(diff) > threshold) {
-            // Был свайп - перелистываем и отменяем клик
+            // Был свайп — перелистываем и ОТМЕНЯЕМ событие
             diff > 0 ? prevSlide() : nextSlide();
-            e.preventDefault();
+            e.stopPropagation();  // ← ОСТАНАВЛИВАЕМ всплытие
+            e.preventDefault();   // ← ОТМЕНЯЕМ действие по умолчанию
         } else {
-            // Был тап - просто возвращаем слайд на место, клик сработает
+            // Был тап — возвращаем слайд, клик сработает
             goToSlide(currentIndex);
         }
         startX = 0;
