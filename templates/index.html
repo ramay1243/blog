@@ -503,7 +503,27 @@
 .mobile-cat-tag:active {
     transform: scale(0.95);
 }
+/* Кнопки ленты */
+.mobile-feed-btn {
+    background: #1a1a1a;
+    border: none;
+    cursor: pointer;
+}
 
+.mobile-feed-btn.active {
+    background: #ff8c00;
+    color: #000;
+}
+
+/* Разделитель */
+.mobile-cat-divider {
+    display: inline-block;
+    color: #444;
+    margin: 0 0.3rem;
+    font-size: 1.2rem;
+    line-height: 1;
+    vertical-align: middle;
+}
 /* Показываем мобильные категории, скрываем десктопные */
 @media (max-width: 768px) {
     .mobile-categories {
@@ -518,6 +538,26 @@
 
 <!-- Мобильные категории (горизонтальный скролл) -->
 <div class="mobile-categories">
+    <!-- Переключатели ленты -->
+    <button class="mobile-cat-tag mobile-feed-btn active" data-feed="fresh" onclick="switchMobileFeedFromTag('fresh')">
+        <i class="fas fa-clock"></i> Свежее
+    </button>
+    <button class="mobile-cat-tag mobile-feed-btn" data-feed="popular" onclick="switchMobileFeedFromTag('popular')">
+        <i class="fas fa-fire"></i> Популярное
+    </button>
+    {% if user %}
+    <button class="mobile-cat-tag mobile-feed-btn" data-feed="myfeed" onclick="switchMobileFeedFromTag('myfeed')">
+        <i class="fas fa-rss"></i> Моя лента
+    </button>
+    {% endif %}
+    <button class="mobile-cat-tag mobile-feed-btn" data-feed="videos" onclick="switchMobileFeedFromTag('videos')">
+        <i class="fas fa-video"></i> Видео
+    </button>
+    
+    <!-- Разделитель -->
+    <span class="mobile-cat-divider">|</span>
+    
+    <!-- Категории -->
     <a href="/" class="mobile-cat-tag {% if not selected_category %}active{% endif %}">
         <i class="fas fa-list"></i> Все
     </a>
@@ -840,6 +880,69 @@ document.querySelectorAll('.left-menu-item').forEach(btn => {
             });
     });
 });
+
+// Переключение ленты из мобильных категорий
+function switchMobileFeedFromTag(feedType) {
+    // Обновляем активную кнопку в мобильных категориях
+    document.querySelectorAll('.mobile-feed-btn').forEach(btn => {
+        btn.classList.remove('active');
+    });
+    document.querySelector(`.mobile-feed-btn[data-feed="${feedType}"]`).classList.add('active');
+    
+    // Обновляем активную кнопку в левом меню
+    document.querySelectorAll('.left-menu-item').forEach(btn => {
+        btn.classList.remove('active');
+        if (btn.dataset.feed === feedType) {
+            btn.classList.add('active');
+        }
+    });
+    
+    // Переключаем ленту
+    currentFeedIndex = feedType;
+    currentCategory = '';
+    resetPagination();
+    
+    const grid = document.getElementById('articlesGrid');
+    const sectionHeader = document.querySelector('.section-header');
+    
+    grid.innerHTML = '<div style="text-align: center; padding: 2rem; color: #888;">Загрузка...</div>';
+    
+    fetch(`/api/feed?type=${feedType}&offset=0&limit=10`)
+        .then(response => response.json())
+        .then(data => {
+            let title = '', desc = '';
+            if (feedType === 'popular') {
+                title = '<i class="fas fa-fire"></i> Популярные статьи';
+                desc = 'Самые читаемые статьи на сайте';
+            } else if (feedType === 'myfeed') {
+                title = '<i class="fas fa-rss"></i> Моя лента';
+                desc = 'Новые статьи от авторов, на которых вы подписаны';
+            } else if (feedType === 'videos') {
+                title = '<i class="fas fa-video"></i> Видео';
+                desc = 'Видео от авторов сообщества';
+            } else {
+                title = '<i class="fas fa-clock"></i> Последние истории';
+                desc = 'Свежие публикации от авторов сообщества';
+            }
+            sectionHeader.innerHTML = `<h2>${title}</h2><p>${desc}</p>`;
+            
+            grid.innerHTML = '';
+            
+            const items = data.videos || data.articles || [];
+            if (items.length === 0) {
+                const emptyMessage = feedType === 'videos' ? 'Пока нет видео' : 'Нет статей';
+                const emptyIcon = feedType === 'videos' ? '🎬' : '📭';
+                grid.innerHTML = `<div class="empty-state"><div class="empty-state-icon">${emptyIcon}</div><h3>${emptyMessage}</h3><p style="color: #888;">Пока нет контента в этой ленте</p></div>`;
+            } else {
+                appendArticles(items);
+                currentOffset = items.length;
+                hasMore = data.has_more;
+            }
+        })
+        .catch(err => {
+            grid.innerHTML = '<div style="text-align: center; padding: 2rem; color: #ef4444;">Ошибка загрузки</div>';
+        });
+}
 
 // Скролл для бесконечной загрузки
 let scrollTimeout;
