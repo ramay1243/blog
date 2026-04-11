@@ -1413,7 +1413,7 @@ function initHeroSlider() {
         track.style.transform = `translateX(${currentTranslate}px)`;
     });
     
-    track.addEventListener('mouseup', () => {
+    track.addEventListener('mouseup', (e) => {
         if (!isDragging) return;
         isDragging = false;
         track.style.cursor = 'grab';
@@ -1424,6 +1424,7 @@ function initHeroSlider() {
         
         if (Math.abs(diff) > threshold) {
             diff > 0 ? prevSlide() : nextSlide();
+            e.preventDefault();
         } else {
             goToSlide(currentIndex);
         }
