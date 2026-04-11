@@ -484,6 +484,65 @@
             font-size: 0.7rem;
             color: #888;
         }
+
+        /* Стрелки для слайдера */
+.hero-arrow {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 44px;
+    height: 44px;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    border: 1px solid rgba(255, 140, 0, 0.3);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 10;
+    transition: all 0.3s ease;
+    color: #fff;
+    font-size: 1.2rem;
+    opacity: 0;
+}
+
+.hero:hover .hero-arrow {
+    opacity: 1;
+}
+
+.hero-arrow:hover {
+    background: rgba(255, 140, 0, 0.8);
+    border-color: #ff8c00;
+    color: #000;
+    transform: translateY(-50%) scale(1.1);
+}
+
+.hero-arrow-left {
+    left: 20px;
+}
+
+.hero-arrow-right {
+    right: 20px;
+}
+
+@media (max-width: 768px) {
+    .hero-arrow {
+        width: 36px;
+        height: 36px;
+        font-size: 1rem;
+        opacity: 0.7;
+    }
+    
+    .hero-arrow-left {
+        left: 10px;
+    }
+    
+    .hero-arrow-right {
+        right: 10px;
+    }
+}
         
         @media (max-width: 768px) {
             .hero { 
@@ -1276,6 +1335,14 @@ body.menu-open {
     <div class="container">
         <!-- Hero блок -->
         <div class="hero" id="heroBlock">
+            <!-- СТРЕЛКИ -->
+            <div class="hero-arrow hero-arrow-left" onclick="heroPrevSlide()">
+                <i class="fas fa-chevron-left"></i>
+            </div>
+            <div class="hero-arrow hero-arrow-right" onclick="heroNextSlide()">
+                <i class="fas fa-chevron-right"></i>
+            </div>
+            
             <div class="hero-slider">
                 <div class="hero-slider-track" id="heroSliderTrack">
                     {% for item in slider_items %}
@@ -1349,14 +1416,26 @@ function initHeroSlider() {
     const track = document.getElementById('heroSliderTrack');
     if (!track) return;
     
-    const slides = Array.from(track.children);
-    if (slides.length <= 1) return;
+    const originalSlides = Array.from(track.children);
+    
+    if (originalSlides.length === 0) return;
+    
+    if (originalSlides.length === 1) {
+        track.style.transform = `translateX(0px)`;
+        loadHeroStats();
+        return;
+    }
+    
+    const firstClone = originalSlides[0].cloneNode(true);
+    track.appendChild(firstClone);
+    
+    let slides = Array.from(track.children);
+    const totalSlides = slides.length;
     
     let currentIndex = 0;
     let interval;
     let startX = 0;
     let currentTranslate = 0;
-    let isDragging = false;
     
     function getSlideWidth() {
         return slides[0].offsetWidth;
@@ -1367,84 +1446,51 @@ function initHeroSlider() {
         track.style.transition = withTransition ? 'transform 0.5s ease-in-out' : 'none';
         track.style.transform = `translateX(-${index * slideWidth}px)`;
         currentIndex = index;
+        
+        if (index === totalSlides - 1) {
+            setTimeout(() => {
+                track.style.transition = 'none';
+                currentIndex = 0;
+                track.style.transform = `translateX(0px)`;
+            }, 500);
+        }
     }
     
     function nextSlide() {
-        if (currentIndex === slides.length - 1) {
-            currentIndex = 0;
+        stopAutoSlide();
+        if (currentIndex === totalSlides - 1) {
+            goToSlide(0);
         } else {
-            currentIndex++;
+            goToSlide(currentIndex + 1);
         }
-        goToSlide(currentIndex);
+        startAutoSlide();
     }
     
     function prevSlide() {
+        stopAutoSlide();
         if (currentIndex === 0) {
-            currentIndex = slides.length - 1;
+            goToSlide(totalSlides - 2);
         } else {
-            currentIndex--;
+            goToSlide(currentIndex - 1);
         }
-        goToSlide(currentIndex);
+        startAutoSlide();
     }
     
     function startAutoSlide() {
         stopAutoSlide();
-        interval = setInterval(nextSlide, 4000);
+        interval = setInterval(() => {
+            if (currentIndex === totalSlides - 1) {
+                goToSlide(0);
+            } else {
+                goToSlide(currentIndex + 1);
+            }
+        }, 4000);
     }
     
     function stopAutoSlide() {
         if (interval) clearInterval(interval);
     }
     
-    // Свайпы мышью
-    track.addEventListener('mousedown', (e) => {
-        startX = e.clientX;
-        isDragging = true;
-        stopAutoSlide();
-        track.style.transition = 'none';
-        track.style.cursor = 'grabbing';
-    });
-    
-    track.addEventListener('mousemove', (e) => {
-        if (!isDragging) return;
-        e.preventDefault();
-        const diff = e.clientX - startX;
-        currentTranslate = -(currentIndex * getSlideWidth()) + diff;
-        track.style.transform = `translateX(${currentTranslate}px)`;
-    });
-    
-    track.addEventListener('mouseup', (e) => {
-        if (!isDragging) return;
-        isDragging = false;
-        track.style.cursor = 'grab';
-        
-        const diff = currentTranslate + (currentIndex * getSlideWidth());
-        const threshold = getSlideWidth() * 0.2; // 20% ширины слайда
-        
-        track.style.transition = 'transform 0.3s ease-in-out';
-        
-        if (Math.abs(diff) > threshold) {
-            // Был свайп — перелистываем и ОТМЕНЯЕМ всплытие события
-            diff > 0 ? prevSlide() : nextSlide();
-            e.stopPropagation();  // ← ОСТАНАВЛИВАЕМ всплытие
-            e.preventDefault();   // ← ОТМЕНЯЕМ действие по умолчанию
-        } else {
-            // Был просто клик без свайпа — возвращаем слайд, клик сработает сам
-            goToSlide(currentIndex);
-        }
-        startAutoSlide();
-    });
-    
-    track.addEventListener('mouseleave', () => {
-        if (isDragging) {
-            isDragging = false;
-            track.style.cursor = 'grab';
-            goToSlide(currentIndex);
-            startAutoSlide();
-        }
-    });
-    
-    // Свайпы пальцем
     track.addEventListener('touchstart', (e) => {
         startX = e.touches[0].clientX;
         stopAutoSlide();
@@ -1463,43 +1509,62 @@ function initHeroSlider() {
         
         const diff = currentTranslate + (currentIndex * getSlideWidth());
         const threshold = getSlideWidth() * 0.2;
-        
         track.style.transition = 'transform 0.3s ease-in-out';
         
         if (Math.abs(diff) > threshold) {
-            // Был свайп — перелистываем и ОТМЕНЯЕМ событие
-            diff > 0 ? prevSlide() : nextSlide();
-            e.stopPropagation();  // ← ОСТАНАВЛИВАЕМ всплытие
-            e.preventDefault();   // ← ОТМЕНЯЕМ действие по умолчанию
+            if (diff > 0) {
+                prevSlide();
+            } else {
+                nextSlide();
+            }
+            e.preventDefault();
         } else {
-            // Был тап — возвращаем слайд, клик сработает
             goToSlide(currentIndex);
         }
         startX = 0;
-        startAutoSlide();
     });
     
-    track.style.cursor = 'grab';
     window.addEventListener('resize', () => goToSlide(currentIndex, false));
     startAutoSlide();
+    
     track.addEventListener('mouseenter', stopAutoSlide);
-    track.addEventListener('mouseleave', () => { if (!isDragging) startAutoSlide(); });
+    track.addEventListener('mouseleave', startAutoSlide);
+    
+    // API для стрелок
+    window.heroSlider = {
+        nextSlide: nextSlide,
+        prevSlide: prevSlide
+    };
+    
+    loadHeroStats();
 }
 
 function loadHeroStats() {
     fetch('/api/stats')
         .then(r => r.json())
         .then(d => {
-            document.getElementById('totalArticles').textContent = d.total_articles;
-            document.getElementById('totalViews').textContent = d.total_views;
-            document.getElementById('totalLikes').textContent = d.total_likes;
+            document.getElementById('totalArticles').textContent = d.total_articles || 0;
+            document.getElementById('totalViews').textContent = d.total_views || 0;
+            document.getElementById('totalLikes').textContent = d.total_likes || 0;
         })
         .catch(e => console.log('Ошибка статистики'));
 }
 
+// Глобальные функции для стрелок
+function heroNextSlide() {
+    if (window.heroSlider) {
+        window.heroSlider.nextSlide();
+    }
+}
+
+function heroPrevSlide() {
+    if (window.heroSlider) {
+        window.heroSlider.prevSlide();
+    }
+}
+
 if (document.getElementById('heroSliderTrack')) {
     initHeroSlider();
-    loadHeroStats();
 }
         </script>
         
