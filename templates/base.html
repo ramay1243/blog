@@ -1729,33 +1729,6 @@ if (document.getElementById('heroSliderTrack')) {
         }
     }
     
-    // Свайпы для мобильного меню
-    let touchStartX = 0;
-    let touchEndX = 0;
-    
-    document.addEventListener('touchstart', (e) => {
-        touchStartX = e.changedTouches[0].screenX;
-    });
-    
-    document.addEventListener('touchend', (e) => {
-        touchEndX = e.changedTouches[0].screenX;
-        handleSwipe();
-    });
-    
-    function handleSwipe() {
-        const menu = document.getElementById('mobileMenu');
-        const isOpen = menu.classList.contains('open');
-        
-        // Свайп вправо - открыть меню
-        if (touchEndX - touchStartX > 70 && !isOpen) {
-            openMobileMenu();
-        }
-        
-        // Свайп влево - закрыть меню
-        if (touchStartX - touchEndX > 70 && isOpen) {
-            closeMobileMenu();
-        }
-    }
     
     // Обновление мобильного бейджа уведомлений
     function updateMobileNotifBadge() {
