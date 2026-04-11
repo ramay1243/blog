@@ -503,11 +503,41 @@
 .mobile-cat-tag:active {
     transform: scale(0.95);
 }
+/* Мобильные переключатели ленты */
+.mobile-feeds {
+    display: none;
+    margin-bottom: 0.8rem;
+    overflow-x: auto;
+    overflow-y: hidden;
+    white-space: nowrap;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    padding-bottom: 0.3rem;
+}
+
+.mobile-feeds::-webkit-scrollbar {
+    display: none;
+}
+
 /* Кнопки ленты */
 .mobile-feed-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.6rem 1.2rem;
     background: #1a1a1a;
+    border-radius: 30px;
     border: none;
+    color: #aaa;
+    font-size: 0.9rem;
+    margin-right: 0.5rem;
+    transition: all 0.2s;
+    white-space: nowrap;
     cursor: pointer;
+}
+
+.mobile-feed-btn i {
+    font-size: 0.9rem;
 }
 
 .mobile-feed-btn.active {
@@ -515,17 +545,16 @@
     color: #000;
 }
 
-/* Разделитель */
-.mobile-cat-divider {
-    display: inline-block;
-    color: #444;
-    margin: 0 0.3rem;
-    font-size: 1.2rem;
-    line-height: 1;
-    vertical-align: middle;
+.mobile-feed-btn:active {
+    transform: scale(0.95);
 }
+
 /* Показываем мобильные категории, скрываем десктопные */
 @media (max-width: 768px) {
+    .mobile-feeds {
+        display: block;
+    }
+    
     .mobile-categories {
         display: block;
     }
@@ -536,28 +565,26 @@
 }
 </style>
 
-<!-- Мобильные категории (горизонтальный скролл) -->
-<div class="mobile-categories">
-    <!-- Переключатели ленты -->
-    <button class="mobile-cat-tag mobile-feed-btn active" data-feed="fresh" onclick="switchMobileFeedFromTag('fresh')">
+<!-- Мобильные переключатели ленты (первая строка) -->
+<div class="mobile-feeds">
+    <button class="mobile-feed-btn active" data-feed="fresh" onclick="switchMobileFeedFromTag('fresh')">
         <i class="fas fa-clock"></i> Свежее
     </button>
-    <button class="mobile-cat-tag mobile-feed-btn" data-feed="popular" onclick="switchMobileFeedFromTag('popular')">
+    <button class="mobile-feed-btn" data-feed="popular" onclick="switchMobileFeedFromTag('popular')">
         <i class="fas fa-fire"></i> Популярное
     </button>
     {% if user %}
-    <button class="mobile-cat-tag mobile-feed-btn" data-feed="myfeed" onclick="switchMobileFeedFromTag('myfeed')">
+    <button class="mobile-feed-btn" data-feed="myfeed" onclick="switchMobileFeedFromTag('myfeed')">
         <i class="fas fa-rss"></i> Моя лента
     </button>
     {% endif %}
-    <button class="mobile-cat-tag mobile-feed-btn" data-feed="videos" onclick="switchMobileFeedFromTag('videos')">
+    <button class="mobile-feed-btn" data-feed="videos" onclick="switchMobileFeedFromTag('videos')">
         <i class="fas fa-video"></i> Видео
     </button>
-    
-    <!-- Разделитель -->
-    <span class="mobile-cat-divider">|</span>
-    
-    <!-- Категории -->
+</div>
+
+<!-- Мобильные категории (вторая строка) -->
+<div class="mobile-categories">
     <a href="/" class="mobile-cat-tag {% if not selected_category %}active{% endif %}">
         <i class="fas fa-list"></i> Все
     </a>
