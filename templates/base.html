@@ -1022,6 +1022,18 @@ body.menu-open {
 .mobile-search input:focus {
     border-color: #ff8c00;
 }
+.hero-slider-track {
+    cursor: grab;
+    user-select: none;
+    -webkit-user-select: none;
+}
+.hero-slider-track:active {
+    cursor: grabbing;
+}
+.hero-slide {
+    user-select: none;
+    -webkit-user-select: none;
+}
     </style>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 </head>
@@ -1341,17 +1353,23 @@ function initHeroSlider() {
     
     let currentIndex = 0;
     let interval;
+    let startX = 0;
+    let currentTranslate = 0;
+    let isDragging = false;
     
-    function goToSlide(index) {
-        const slideWidth = slides[0].offsetWidth;
-        track.style.transition = 'transform 0.5s ease-in-out';
+    function getSlideWidth() {
+        return slides[0].offsetWidth;
+    }
+    
+    function goToSlide(index, withTransition = true) {
+        const slideWidth = getSlideWidth();
+        track.style.transition = withTransition ? 'transform 0.5s ease-in-out' : 'none';
         track.style.transform = `translateX(-${index * slideWidth}px)`;
         currentIndex = index;
     }
     
     function nextSlide() {
         if (currentIndex === slides.length - 1) {
-            // Если последний слайд - возвращаемся к первому
             currentIndex = 0;
         } else {
             currentIndex++;
@@ -1359,44 +1377,118 @@ function initHeroSlider() {
         goToSlide(currentIndex);
     }
     
-    // Запускаем автопрокрутку
-    interval = setInterval(nextSlide, 4000);
-    
-    // При ресайзе пересчитываем позицию
-    window.addEventListener('resize', () => {
-        track.style.transition = 'none';
+    function prevSlide() {
+        if (currentIndex === 0) {
+            currentIndex = slides.length - 1;
+        } else {
+            currentIndex--;
+        }
         goToSlide(currentIndex);
-        setTimeout(() => {
-            track.style.transition = 'transform 0.5s ease-in-out';
-        }, 50);
+    }
+    
+    function startAutoSlide() {
+        stopAutoSlide();
+        interval = setInterval(nextSlide, 4000);
+    }
+    
+    function stopAutoSlide() {
+        if (interval) clearInterval(interval);
+    }
+    
+    // Свайпы мышью
+    track.addEventListener('mousedown', (e) => {
+        startX = e.clientX;
+        isDragging = true;
+        stopAutoSlide();
+        track.style.transition = 'none';
+        track.style.cursor = 'grabbing';
     });
     
-    // Останавливаем при наведении
-    track.addEventListener('mouseenter', () => clearInterval(interval));
-    track.addEventListener('mouseleave', () => {
-        clearInterval(interval);
-        interval = setInterval(nextSlide, 4000);
+    track.addEventListener('mousemove', (e) => {
+        if (!isDragging) return;
+        e.preventDefault();
+        const diff = e.clientX - startX;
+        currentTranslate = -(currentIndex * getSlideWidth()) + diff;
+        track.style.transform = `translateX(${currentTranslate}px)`;
     });
+    
+    track.addEventListener('mouseup', () => {
+        if (!isDragging) return;
+        isDragging = false;
+        track.style.cursor = 'grab';
+        
+        const diff = currentTranslate + (currentIndex * getSlideWidth());
+        const threshold = getSlideWidth() * 0.2;
+        track.style.transition = 'transform 0.3s ease-in-out';
+        
+        if (Math.abs(diff) > threshold) {
+            diff > 0 ? prevSlide() : nextSlide();
+        } else {
+            goToSlide(currentIndex);
+        }
+        startAutoSlide();
+    });
+    
+    track.addEventListener('mouseleave', () => {
+        if (isDragging) {
+            isDragging = false;
+            track.style.cursor = 'grab';
+            goToSlide(currentIndex);
+            startAutoSlide();
+        }
+    });
+    
+    // Свайпы пальцем
+    track.addEventListener('touchstart', (e) => {
+        startX = e.touches[0].clientX;
+        stopAutoSlide();
+        track.style.transition = 'none';
+    }, { passive: true });
+    
+    track.addEventListener('touchmove', (e) => {
+        if (!startX) return;
+        const diff = e.touches[0].clientX - startX;
+        currentTranslate = -(currentIndex * getSlideWidth()) + diff;
+        track.style.transform = `translateX(${currentTranslate}px)`;
+    }, { passive: true });
+    
+    track.addEventListener('touchend', () => {
+        if (!startX) return;
+        const diff = currentTranslate + (currentIndex * getSlideWidth());
+        const threshold = getSlideWidth() * 0.2;
+        track.style.transition = 'transform 0.3s ease-in-out';
+        
+        if (Math.abs(diff) > threshold) {
+            diff > 0 ? prevSlide() : nextSlide();
+        } else {
+            goToSlide(currentIndex);
+        }
+        startX = 0;
+        startAutoSlide();
+    });
+    
+    track.style.cursor = 'grab';
+    window.addEventListener('resize', () => goToSlide(currentIndex, false));
+    startAutoSlide();
+    track.addEventListener('mouseenter', stopAutoSlide);
+    track.addEventListener('mouseleave', () => { if (!isDragging) startAutoSlide(); });
 }
-                
-                        function loadHeroStats() {
-                fetch('/api/stats')
-                    .then(response => response.json())
-                    .then(data => {
-                        const totalArticles = document.getElementById('totalArticles');
-                        const totalViews = document.getElementById('totalViews');
-                        const totalLikes = document.getElementById('totalLikes');
-                        if (totalArticles) totalArticles.textContent = data.total_articles;
-                        if (totalViews) totalViews.textContent = data.total_views;
-                        if (totalLikes) totalLikes.textContent = data.total_likes;
-                    })
-                    .catch(err => console.log('Ошибка загрузки статистики'));
-            }
-            
-            if (document.getElementById('heroSliderTrack')) {
-                initHeroSlider();
-                loadHeroStats();
-            }
+
+function loadHeroStats() {
+    fetch('/api/stats')
+        .then(r => r.json())
+        .then(d => {
+            document.getElementById('totalArticles').textContent = d.total_articles;
+            document.getElementById('totalViews').textContent = d.total_views;
+            document.getElementById('totalLikes').textContent = d.total_likes;
+        })
+        .catch(e => console.log('Ошибка статистики'));
+}
+
+if (document.getElementById('heroSliderTrack')) {
+    initHeroSlider();
+    loadHeroStats();
+}
         </script>
         
         {% block content %}{% endblock %}
