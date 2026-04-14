@@ -17,17 +17,17 @@
             padding-right: 2rem;
         }
         
-        .navbar { 
-            background: #000; 
-            border-bottom: 2px solid #ff8c00; 
-            padding: 1rem 2rem; 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-            flex-wrap: wrap;
-            gap: 1rem;
-            padding-right: 10rem;
-        }
+.navbar { 
+    background: #000; 
+    border-bottom: 2px solid #ff8c00; 
+    padding: 0 2rem; 
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center; 
+    gap: 1rem;
+    padding-right: 10rem;
+    height: 70px;
+}
         
         .navbar h2 {
             margin-left: 10rem;
@@ -38,6 +38,8 @@
             align-items: center; 
             flex-wrap: wrap; 
             gap: 1rem;
+            line-height: 1; 
+            top: -2px;
         }
         
         .nav-links a { 
@@ -47,6 +49,7 @@
             display: inline-flex;
             align-items: center;
             gap: 0.3rem;
+            line-height: 1;
         }
         
         .nav-links a:hover { color: #ff8c00; }
@@ -206,6 +209,7 @@
             padding: 0.3rem 0.5rem;
             border-radius: 40px;
             transition: background 0.2s;
+            line-height: 1;  
         }
         
         .user-menu-btn:hover {
@@ -665,10 +669,9 @@
 }
 
 .mobile-logo {
-    color: #ff8c00;
     text-decoration: none;
-    font-size: 1.3rem;
-    font-weight: bold;
+    display: flex;
+    align-items: center;
 }
 
 .mobile-notif {
@@ -1205,7 +1208,9 @@ body.menu-open {
     <button class="burger-btn" onclick="openMobileMenu()">
         <i class="fas fa-bars"></i>
     </button>
-    <a href="/" class="mobile-logo">StoryBlog</a>
+    <a href="/" class="mobile-logo">
+    <img src="/static/logo.png" alt="StoryBlog" style="height: 32px; width: auto;">
+</a>
     <div class="mobile-header-actions">
         {% if user %}
         <!-- Кнопка Написать -->
@@ -1355,12 +1360,16 @@ body.menu-open {
     </div>
     
     <div class="mobile-menu-footer">
-        <i class="fas fa-copyright"></i> 2026 StoryBlog
+        <i class="fas fa-copyright"></i> 2026 scribli
     </div>
 </div>
 
-    <nav class="navbar">
-        <h2><a href="/" style="color:#ff8c00; text-decoration:none;">StoryBlog</a></h2>
+<nav class="navbar">
+    <h2 style="margin-left: 7rem;">
+        <a href="/">
+            <img src="/static/logo.jpg" alt="StoryBlog" style="height: 95px; width: auto; vertical-align: middle;">
+        </a>
+    </h2>
         <div class="nav-links">
             <a href="/">Главная</a>
             
@@ -1702,7 +1711,7 @@ if (document.getElementById('heroSliderTrack')) {
             <i class="fas fa-lock"></i> Политика
         </a>
         <div class="menu-footer-copyright">
-            <i class="fas fa-copyright"></i> 2026 StoryBlog
+            <i class="fas fa-copyright"></i> 2026 scribli
         </div>
     </div>
 </div>

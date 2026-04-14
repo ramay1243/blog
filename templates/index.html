@@ -676,6 +676,7 @@
                         <div class="stats-mini">
                             <span><i class="fas fa-eye"></i> {{ article.views }}</span>
                             <span><i class="fas fa-heart"></i> {{ article.likes }}</span>
+                            <span><i class="fas fa-comment"></i> {{ article.comments_count }}</span>
                         </div>
                     </div>
                 </div>
@@ -774,6 +775,7 @@ function appendArticles(items) {
                         <div class="stats-mini">
                             <span><i class="fas ${viewsIcon}"></i> ${item.views || 0}</span>
                             <span><i class="fas fa-heart"></i> ${item.likes || 0}</span>
+                            <span><i class="fas fa-comment"></i> ${item.comments_count || 0}</span>
                         </div>
                     </div>
                 </div>

@@ -506,12 +506,12 @@
             <div class="profile-avatar" id="avatarContainer">
                 <img src="/static/avatars/{{ user.avatar }}" alt="Аватар" style="width: 100px; height: 100px; border-radius: 50%; object-fit: cover;" id="avatarImg">
                 <div id="avatarMenu" class="avatar-menu" style="display: none;">
-                    <div class="avatar-menu-item" onclick="document.getElementById('avatarInput').click()">
-                        📷 Сменить аватар
-                    </div>
-                    <div class="avatar-menu-item" onclick="viewAvatar()">
-                        👁️ Посмотреть
-                    </div>
+<div class="avatar-menu-item" onclick="document.getElementById('avatarInput').click()">
+    <i class="fas fa-camera"></i> Сменить аватар
+</div>
+<div class="avatar-menu-item" onclick="viewAvatar()">
+    <i class="fas fa-eye"></i> Посмотреть
+</div>
                 </div>
             </div>
             <div class="profile-name">{{ user.username }}</div>
@@ -573,11 +573,12 @@
                         <div class="article-item-meta">
                             <span class="status-published"><i class="fas fa-check-circle"></i> Опубликовано</span>
                         </div>
-                        <div class="article-item-stats">
-                            <span><i class="fas fa-eye"></i> {{ article.views }} просмотров</span>
-                            <span><i class="fas fa-heart"></i> {{ article.likes }} лайков</span>
-                            <span><i class="fas fa-calendar-alt"></i> {{ article.created_at.strftime('%d.%m.%Y') }}</span>
-                        </div>
+ <div class="article-item-stats">
+    <span><i class="fas fa-eye"></i> {{ article.views }}</span>
+    <span><i class="fas fa-heart"></i> {{ article.likes }}</span>
+    <span><i class="fas fa-comment"></i> {{ article.comments_count }}</span>
+    <span><i class="fas fa-calendar-alt"></i> {{ article.created_at.strftime('%d.%m.%Y') }}</span>
+</div>
                         <div class="article-item-actions">
                             <a href="/edit/{{ article.id }}" class="btn-edit"><i class="fas fa-edit"></i> Редактировать</a>
                             <button class="btn-delete" onclick="confirmDelete({{ article.id }}, '{{ article.title|replace("'", "\\'") }}')"><i class="fas fa-trash-alt"></i> Удалить</button>
@@ -645,11 +646,12 @@
                             <div class="video-item-title">
                                 <a href="/video/{{ video.id }}">{{ video.title }}</a>
                             </div>
-                            <div class="video-item-stats">
-                                <span><i class="fas fa-eye"></i> {{ video.views }} просмотров</span>
-                                <span><i class="fas fa-heart"></i> {{ video.likes }} лайков</span>
-                                <span><i class="fas fa-calendar-alt"></i> {{ video.created_at.strftime('%d.%m.%Y') }}</span>
-                            </div>
+<div class="video-item-stats">
+    <span><i class="fas fa-eye"></i> {{ video.views }}</span>
+    <span><i class="fas fa-heart"></i> {{ video.likes }}</span>
+    <span><i class="fas fa-comment"></i> {{ video.comments_count }}</span>
+    <span><i class="fas fa-calendar-alt"></i> {{ video.created_at.strftime('%d.%m.%Y') }}</span>
+</div>
                         </div>
                         <div class="video-item-actions">
                             <form method="post" action="/delete-video/{{ video.id }}" style="display: inline; position: relative; z-index: 1000;" onsubmit="return confirm('Вы уверены, что хотите удалить видео &quot;{{ video.title|replace('"', '\\"') }}&quot;?');">

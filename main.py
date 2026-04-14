@@ -118,6 +118,7 @@ async def home(request: Request, category: str = None, feed: str = "fresh", db: 
         author = db.query(User).filter(User.id == article.user_id).first()
         article.author_name = author.username if author else f"Автор #{article.user_id}"
         article.author_avatar = author.avatar if author else 'default.png'
+        article.comments_count = db.query(Comment).filter(Comment.article_id == article.id).count()
         article_cat = db.query(ArticleCategory).filter(ArticleCategory.article_id == article.id).first()
         if article_cat:
             cat = db.query(Category).filter(Category.id == article_cat.category_id).first()
@@ -244,11 +245,19 @@ async def profile(request: Request, db: Session = Depends(get_db)):
         Article.is_published == True
     ).order_by(Article.created_at.desc()).all()
     
+    for article in published_articles:
+        article.comments_count = db.query(Comment).filter(Comment.article_id == article.id).count()
+    
     draft_articles = db.query(Article).filter(
         Article.user_id == user.id,
         Article.is_published == False
     ).order_by(Article.created_at.desc()).all()
+    
     user_videos = db.query(Video).filter(Video.user_id == user.id).order_by(Video.created_at.desc()).all()
+    
+    # ← ВОТ ЭТО ДОБАВЬ
+    for video in user_videos:
+        video.comments_count = db.query(VideoComment).filter(VideoComment.video_id == video.id).count()
     
     subscribers_count = db.query(Subscription).filter(Subscription.author_id == user.id).count()
     subscriptions_count = db.query(Subscription).filter(Subscription.subscriber_id == user.id).count()
@@ -1225,6 +1234,7 @@ async def user_profile(request: Request, user_id: int, db: Session = Depends(get
         if article_cat:
             cat = db.query(Category).filter(Category.id == article_cat.category_id).first()
             article.category = cat
+            article.comments_count = db.query(Comment).filter(Comment.article_id == article.id).count()
     
     is_subscribed = False
     subscribers_count = db.query(Subscription).filter(Subscription.author_id == user_id).count()
@@ -1528,14 +1538,16 @@ async def api_feed(request: Request, type: str = "fresh", category: str = None, 
         result = []
         for video in videos:
             author = db.query(User).filter(User.id == video.user_id).first()
+            comments_count = db.query(VideoComment).filter(VideoComment.video_id == video.id).count()  # ← ДОБАВИТЬ
             
             result.append({
                 "id": video.id,
                 "title": video.title,
-                "slug": str(video.id),  # для совместимости
+                "slug": str(video.id),
                 "description": video.description or "",
                 "views": video.views,
                 "likes": video.likes,
+                "comments_count": comments_count,  # ← ДОБАВИТЬ
                 "created_at": video.created_at.isoformat(),
                 "user_id": video.user_id,
                 "author_name": author.username if author else f"Автор #{video.user_id}",
@@ -1565,7 +1577,7 @@ async def api_feed(request: Request, type: str = "fresh", category: str = None, 
         if author_ids:
             query = query.filter(Article.user_id.in_(author_ids))
         else:
-            query = query.filter(Article.user_id == -1)  # нет подписок
+            query = query.filter(Article.user_id == -1)
         query = query.order_by(Article.created_at.desc())
     else:  # fresh
         query = query.order_by(Article.created_at.desc())
@@ -1577,6 +1589,7 @@ async def api_feed(request: Request, type: str = "fresh", category: str = None, 
     for article in articles:
         author = db.query(User).filter(User.id == article.user_id).first()
         article_cat = db.query(ArticleCategory).filter(ArticleCategory.article_id == article.id).first()
+        comments_count = db.query(Comment).filter(Comment.article_id == article.id).count()  # ← ДОБАВИТЬ
         category_obj = None
         if article_cat:
             cat = db.query(Category).filter(Category.id == article_cat.category_id).first()
@@ -1589,6 +1602,7 @@ async def api_feed(request: Request, type: str = "fresh", category: str = None, 
             "description": article.description,
             "views": article.views,
             "likes": article.likes,
+            "comments_count": comments_count,  # ← ДОБАВИТЬ
             "created_at": article.created_at.isoformat(),
             "user_id": article.user_id,
             "author_name": author.username if author else f"Автор #{article.user_id}",
