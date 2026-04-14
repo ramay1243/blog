@@ -1094,6 +1094,100 @@ body.menu-open {
     -webkit-user-select: none;
     pointer-events: auto;
 }
+/* Левое меню */
+.layout {
+    display: flex;
+    gap: 2rem;
+    align-items: flex-start;
+}
+
+.left-menu {
+    width: 220px;
+    flex-shrink: 0;
+    position: sticky;
+    top: 2rem;
+    background: #0d0d0d;
+    border-radius: 20px;
+    border: 1px solid rgba(255, 140, 0, 0.15);
+    overflow: hidden;
+}
+
+.left-menu-item {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    padding: 0.8rem 1.2rem;
+    color: #aaa;
+    background: none;
+    border: none;
+    width: 100%;
+    text-align: left;
+    cursor: pointer;
+    transition: all 0.2s;
+    border-left: 3px solid transparent;
+    font-size: 1rem;
+    text-decoration: none;
+}
+
+.left-menu-item:hover {
+    text-decoration: none;
+    background: rgba(255, 140, 0, 0.1);
+    color: #ff8c00;
+}
+
+.left-menu-item.active {
+    background: rgba(255, 140, 0, 0.15);
+    color: #ff8c00;
+    border-left-color: #ff8c00;
+}
+
+.menu-footer {
+    margin-top: 2rem;
+    padding-top: 0.5rem;
+    border-top: 1px solid rgba(255, 140, 0, 0.2);
+}
+
+.menu-footer-item {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    padding: 0.6rem 1.2rem;
+    color: #aaa;
+    font-size: 0.9rem;
+    text-decoration: none;
+    transition: all 0.2s;
+    border-radius: 12px;
+}
+
+.menu-footer-item:hover {
+    background: rgba(255, 140, 0, 0.1);
+    color: #ff8c00;
+}
+
+.menu-footer-copyright {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.6rem 1.2rem;
+    color: #444;
+    font-size: 0.7rem;
+    margin-top: 0.5rem;
+}
+
+.content-right {
+    flex: 1;
+    min-width: 0;
+}
+
+/* Скрываем левое меню на мобильных */
+@media (max-width: 768px) {
+    .left-menu {
+        display: none !important;
+    }
+    .layout {
+        display: block;
+    }
+}
     </style>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 </head>
@@ -1333,7 +1427,8 @@ body.menu-open {
     </nav>
     
     <div class="container">
-        <!-- Hero блок -->
+        <!-- Hero блок (только на главной) -->
+        {% block hero %}
         <div class="hero" id="heroBlock">
             <!-- СТРЕЛКИ -->
             <div class="hero-arrow hero-arrow-left" onclick="heroPrevSlide()">
@@ -1530,7 +1625,6 @@ function initHeroSlider() {
     track.addEventListener('mouseenter', stopAutoSlide);
     track.addEventListener('mouseleave', startAutoSlide);
     
-    // API для стрелок
     window.heroSlider = {
         nextSlide: nextSlide,
         prevSlide: prevSlide
@@ -1543,14 +1637,16 @@ function loadHeroStats() {
     fetch('/api/stats')
         .then(r => r.json())
         .then(d => {
-            document.getElementById('totalArticles').textContent = d.total_articles || 0;
-            document.getElementById('totalViews').textContent = d.total_views || 0;
-            document.getElementById('totalLikes').textContent = d.total_likes || 0;
+            const totalArticles = document.getElementById('totalArticles');
+            const totalViews = document.getElementById('totalViews');
+            const totalLikes = document.getElementById('totalLikes');
+            if (totalArticles) totalArticles.textContent = d.total_articles || 0;
+            if (totalViews) totalViews.textContent = d.total_views || 0;
+            if (totalLikes) totalLikes.textContent = d.total_likes || 0;
         })
         .catch(e => console.log('Ошибка статистики'));
 }
 
-// Глобальные функции для стрелок
 function heroNextSlide() {
     if (window.heroSlider) {
         window.heroSlider.nextSlide();
@@ -1566,9 +1662,51 @@ function heroPrevSlide() {
 if (document.getElementById('heroSliderTrack')) {
     initHeroSlider();
 }
-        </script>
+</script>
+        {% endblock %}
         
-        {% block content %}{% endblock %}
+        <!-- Основной контент с левым меню -->
+        <div class="layout">
+            <!-- Левое меню -->
+{% block left_menu %}
+<div class="left-menu">
+    <div class="left-menu-item {% if feed == 'fresh' %}active{% endif %}" data-feed="fresh" onclick="switchFeed('fresh')">
+        <i class="fas fa-clock"></i> Свежее
+    </div>
+    <div class="left-menu-item {% if feed == 'popular' %}active{% endif %}" data-feed="popular" onclick="switchFeed('popular')">
+        <i class="fas fa-fire"></i> Популярное
+    </div>
+    {% if user %}
+    <div class="left-menu-item {% if feed == 'myfeed' %}active{% endif %}" data-feed="myfeed" onclick="switchFeed('myfeed')">
+        <i class="fas fa-rss"></i> Моя лента
+    </div>
+    {% endif %}
+    <div class="left-menu-item" data-feed="videos" onclick="switchFeed('videos')">
+        <i class="fas fa-video"></i> Видео
+    </div>
+    
+    <div class="menu-footer">
+        <a href="/about" class="menu-footer-item">
+            <i class="fas fa-info-circle"></i> О сайте
+        </a>
+        <a href="/contacts" class="menu-footer-item">
+            <i class="fas fa-envelope"></i> Контакты
+        </a>
+        <a href="/privacy" class="menu-footer-item">
+            <i class="fas fa-lock"></i> Политика
+        </a>
+        <div class="menu-footer-copyright">
+            <i class="fas fa-copyright"></i> 2026 StoryBlog
+        </div>
+    </div>
+</div>
+{% endblock %}
+            
+            <!-- Контент страницы -->
+            <div class="content-right">
+                {% block content %}{% endblock %}
+            </div>
+        </div>
     </div>
 
     <script>
@@ -1698,7 +1836,6 @@ if (document.getElementById('heroSliderTrack')) {
     function switchMobileFeed(feedType) {
         closeMobileMenu();
         
-        // Переключаем ленту на главной странице
         if (window.location.pathname === '/') {
             const feedBtn = document.querySelector(`.left-menu-item[data-feed="${feedType}"]`);
             if (feedBtn) {
@@ -1707,7 +1844,6 @@ if (document.getElementById('heroSliderTrack')) {
                 window.location.href = '/videos';
             }
         } else {
-            // Если не на главной - переходим
             if (feedType === 'videos') {
                 window.location.href = '/videos';
             } else {
@@ -1717,7 +1853,6 @@ if (document.getElementById('heroSliderTrack')) {
         }
     }
     
-    // При загрузке главной проверяем отложенную ленту
     if (window.location.pathname === '/') {
         const pendingFeed = sessionStorage.getItem('pendingFeed');
         if (pendingFeed) {
@@ -1729,8 +1864,6 @@ if (document.getElementById('heroSliderTrack')) {
         }
     }
     
-    
-    // Обновление мобильного бейджа уведомлений
     function updateMobileNotifBadge() {
         fetch('/api/notifications/count')
             .then(res => res.json())
@@ -1752,6 +1885,7 @@ if (document.getElementById('heroSliderTrack')) {
         setInterval(updateMobileNotifBadge, 5000);
     });
 </script>
+
 <script>
 // ========== МОБИЛЬНОЕ МЕНЮ ПОЛЬЗОВАТЕЛЯ ==========
 function toggleMobileUserMenu() {
@@ -1759,7 +1893,6 @@ function toggleMobileUserMenu() {
     dropdown.classList.toggle('show');
 }
 
-// Закрытие при клике вне
 document.addEventListener('click', function(event) {
     const userMenu = document.querySelector('.mobile-user-menu');
     if (userMenu && !userMenu.contains(event.target)) {
@@ -1823,7 +1956,6 @@ function markMobileNotifAndRedirect(notifId, link) {
         });
 }
 
-// Обновление мобильного бейджа
 function updateMobileNotifBadge() {
     fetch('/api/notifications/count')
         .then(res => res.json())
@@ -1844,6 +1976,38 @@ document.addEventListener('DOMContentLoaded', () => {
     updateMobileNotifBadge();
     setInterval(updateMobileNotifBadge, 5000);
 });
+</script>
+<script>
+function switchFeed(feedType) {
+    // Обновляем активный класс в левом меню
+    document.querySelectorAll('.left-menu-item').forEach(item => {
+        item.classList.remove('active');
+        if (item.dataset.feed === feedType) {
+            item.classList.add('active');
+        }
+    });
+    
+    // Обновляем активный класс в мобильном меню
+    document.querySelectorAll('.mobile-feed-btn').forEach(btn => {
+        btn.classList.remove('active');
+        if (btn.dataset.feed === feedType) {
+            btn.classList.add('active');
+        }
+    });
+    
+    // Если мы на главной — используем существующую логику
+    if (window.location.pathname === '/') {
+        if (typeof window.loadFeedContent === 'function') {
+         window.loadFeedContent(feedType);
+        } else {
+            // fallback: редирект с параметром
+            window.location.href = '/?feed=' + feedType;
+        }
+    } else {
+        // Если не на главной — переходим на главную с нужным feed
+        window.location.href = '/?feed=' + feedType;
+    }
+}
 </script>
 </body>
 </html>

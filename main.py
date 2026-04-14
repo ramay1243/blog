@@ -85,7 +85,7 @@ def get_video_or_404(db: Session, video_id: int):
 
 # ============ ГЛАВНАЯ ============
 @app.get("/", response_class=HTMLResponse)
-async def home(request: Request, category: str = None, db: Session = Depends(get_db)):
+async def home(request: Request, category: str = None, feed: str = "fresh", db: Session = Depends(get_db)):
     user = get_current_user(request, db)
     categories = db.query(Category).all()
     
@@ -97,7 +97,22 @@ async def home(request: Request, category: str = None, db: Session = Depends(get
             article_ids = db.query(ArticleCategory.article_id).filter(ArticleCategory.category_id == selected_category.id)
             query = query.filter(Article.id.in_(article_ids))
     
-    articles = query.order_by(Article.created_at.desc()).limit(20).all()
+    # ========== ОБРАБОТКА FEED ==========
+    if feed == "popular":
+        query = query.order_by(Article.views.desc())
+    elif feed == "myfeed" and user:
+        subscriptions = db.query(Subscription).filter(Subscription.subscriber_id == user.id).all()
+        author_ids = [s.author_id for s in subscriptions]
+        if author_ids:
+            query = query.filter(Article.user_id.in_(author_ids))
+        else:
+            query = query.filter(Article.user_id == -1)  # нет подписок
+        query = query.order_by(Article.created_at.desc())
+    else:  # fresh
+        query = query.order_by(Article.created_at.desc())
+    # ====================================
+    
+    articles = query.limit(20).all()
     
     for article in articles:
         author = db.query(User).filter(User.id == article.user_id).first()
@@ -147,6 +162,7 @@ async def home(request: Request, category: str = None, db: Session = Depends(get
         "selected_category": selected_category,
         "popular_articles": popular_articles,
         "top_authors": top_authors,
+        "feed": feed,  # ← ВАЖНО: добавьте эту строку
         "meta_title": f"{selected_category.name} - StoryBlog" if selected_category else "StoryBlog - Истории и блоги",
         "meta_description": f"Статьи в категории {selected_category.name}" if selected_category else "Платформа для публикации личных историй"
     })
@@ -1516,7 +1532,7 @@ async def api_feed(request: Request, type: str = "fresh", category: str = None, 
             result.append({
                 "id": video.id,
                 "title": video.title,
-                "slug": str(video.id),
+                "slug": str(video.id),  # для совместимости
                 "description": video.description or "",
                 "views": video.views,
                 "likes": video.likes,
@@ -1531,6 +1547,57 @@ async def api_feed(request: Request, type: str = "fresh", category: str = None, 
             })
         
         return {"videos": result, "total": total_count, "has_more": offset + limit < total_count}
+    
+    # ========== ОБРАБОТКА СТАТЕЙ ==========
+    query = db.query(Article).filter(Article.is_published == True)
+    
+    if category:
+        selected_category = db.query(Category).filter(Category.slug == category).first()
+        if selected_category:
+            article_ids = db.query(ArticleCategory.article_id).filter(ArticleCategory.category_id == selected_category.id)
+            query = query.filter(Article.id.in_(article_ids))
+    
+    if type == "popular":
+        query = query.order_by(Article.views.desc())
+    elif type == "myfeed" and user:
+        subscriptions = db.query(Subscription).filter(Subscription.subscriber_id == user.id).all()
+        author_ids = [s.author_id for s in subscriptions]
+        if author_ids:
+            query = query.filter(Article.user_id.in_(author_ids))
+        else:
+            query = query.filter(Article.user_id == -1)  # нет подписок
+        query = query.order_by(Article.created_at.desc())
+    else:  # fresh
+        query = query.order_by(Article.created_at.desc())
+    
+    total_count = query.count()
+    articles = query.offset(offset).limit(limit).all()
+    
+    result = []
+    for article in articles:
+        author = db.query(User).filter(User.id == article.user_id).first()
+        article_cat = db.query(ArticleCategory).filter(ArticleCategory.article_id == article.id).first()
+        category_obj = None
+        if article_cat:
+            cat = db.query(Category).filter(Category.id == article_cat.category_id).first()
+            category_obj = {"icon": cat.icon, "name": cat.name} if cat else None
+        
+        result.append({
+            "id": article.id,
+            "title": article.title,
+            "slug": article.slug,
+            "description": article.description,
+            "views": article.views,
+            "likes": article.likes,
+            "created_at": article.created_at.isoformat(),
+            "user_id": article.user_id,
+            "author_name": author.username if author else f"Автор #{article.user_id}",
+            "author_avatar": author.avatar if author else 'default.png',
+            "type": "article",
+            "category": category_obj
+        })
+    
+    return {"articles": result, "total": total_count, "has_more": offset + limit < total_count}
     
     # ========== ОБРАБОТКА СТАТЕЙ ==========
     query = db.query(Article).filter(Article.is_published == True)

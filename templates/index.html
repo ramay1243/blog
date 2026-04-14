@@ -620,48 +620,19 @@
     {% endfor %}
 </div>
 
-<!-- Лента статей с левым меню -->
-<div class="layout">
-    <!-- Левое меню (кнопки) -->
-    <div class="left-menu">
-        <button class="left-menu-item active" data-feed="fresh">
-            <i class="fas fa-clock"></i> Свежее
-        </button>
-        <button class="left-menu-item" data-feed="popular">
-            <i class="fas fa-fire"></i> Популярное
-        </button>
-        {% if user %}
-        <button class="left-menu-item" data-feed="myfeed">
-            <i class="fas fa-rss"></i> Моя лента
-        </button>
-        {% endif %}
-        <!-- === ИЗМЕНЕНИЕ: Заменена ссылка на кнопку === -->
-        <button class="left-menu-item" data-feed="videos">
-            <i class="fas fa-video"></i> Видео
-        </button>
-        
-        <!-- Футер под меню -->
-        <div class="menu-footer">
-            <a href="/about" class="menu-footer-item">
-                <i class="fas fa-info-circle"></i> О сайте
-            </a>
-            <a href="/contacts" class="menu-footer-item">
-                <i class="fas fa-envelope"></i> Контакты
-            </a>
-            <a href="/privacy" class="menu-footer-item">
-                <i class="fas fa-lock"></i> Политика
-            </a>
-            <div class="menu-footer-copyright">
-                <i class="fas fa-copyright"></i> 2026 StoryBlog
-            </div>
-        </div>
-    </div>
-    
     <!-- Правая часть: статьи -->
     <div class="content-right">
         <div class="section-header">
-            <h2><i class="fas fa-clock"></i> Последние истории</h2>
-            <p>Свежие публикации от авторов сообщества</p>
+            {% if feed == 'popular' %}
+                <h2><i class="fas fa-fire"></i> Популярные статьи</h2>
+                <p>Самые читаемые статьи на сайте</p>
+            {% elif feed == 'myfeed' %}
+                <h2><i class="fas fa-rss"></i> Моя лента</h2>
+                <p>Новые статьи от авторов, на которых вы подписаны</p>
+            {% else %}
+                <h2><i class="fas fa-clock"></i> Последние истории</h2>
+                <p>Свежие публикации от авторов сообщества</p>
+            {% endif %}
         </div>
 
         <div class="articles-grid" id="articlesGrid">
@@ -727,13 +698,14 @@
 
 
 <script>
-// ========== БЕСКОНЕЧНАЯ ПРОКРУТКА ==========
+// ========== ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ ==========
 let currentOffset = {{ articles|length }};
 let currentFeedIndex = '{% if feed == "popular" %}popular{% elif feed == "myfeed" %}myfeed{% else %}fresh{% endif %}';
 let isLoading = false;
 let hasMore = true;
 let currentCategory = '{% if selected_category %}{{ selected_category.slug }}{% endif %}';
 
+// ========== ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ ==========
 function escapeHtml(text) {
     if (!text) return '';
     const div = document.createElement('div');
@@ -741,18 +713,25 @@ function escapeHtml(text) {
     return div.innerHTML;
 }
 
-// === ИЗМЕНЕНИЕ: Обновлена функция для поддержки видео ===
+function resetPagination() {
+    currentOffset = 0;
+    hasMore = true;
+    isLoading = false;
+    
+    const endMessage = document.querySelector('.end-message');
+    if (endMessage) endMessage.remove();
+}
+
+// ========== ОТРИСОВКА КАРТОЧЕК ==========
 function appendArticles(items) {
     const grid = document.getElementById('articlesGrid');
     
     items.forEach(item => {
-        // Проверяем, видео это или статья
         const isVideo = item.type === 'video' || item.video_url;
         const linkUrl = isVideo ? `/video/${item.id}` : `/article/${item.slug}`;
         const readText = isVideo ? 'Смотреть' : 'Читать';
         const viewsIcon = isVideo ? 'fa-play' : 'fa-eye';
         
-        // Для видео добавляем плеер ПОСЛЕ заголовка
         const videoPlayerHtml = isVideo ? `
             <div class="video-player-inline" style="margin: 1rem 0; border-radius: 12px; overflow: hidden; background: #000;">
                 <video controls style="width: 100%; max-height: 350px; display: block;" poster="${item.thumbnail_url || ''}">
@@ -782,13 +761,9 @@ function appendArticles(items) {
                 <div class="card-content">
                     ${item.category ? `<div class="cat-badge">${escapeHtml(item.category.icon)} ${escapeHtml(item.category.name)}</div>` : ''}
                     <h3 class="article-title">
-                        <a href="${linkUrl}">
-                            ${escapeHtml(item.title)}
-                        </a>
+                        <a href="${linkUrl}">${escapeHtml(item.title)}</a>
                     </h3>
-                    
                     ${videoPlayerHtml}
-                    
                     <div class="article-excerpt">
                         ${escapeHtml(item.description ? item.description.substring(0, 140) : '')}${item.description && item.description.length > 140 ? '...' : ''}
                     </div>
@@ -808,15 +783,7 @@ function appendArticles(items) {
     });
 }
 
-function resetPagination() {
-    currentOffset = {{ articles|length }};
-    hasMore = true;
-    isLoading = false;
-    
-    const endMessage = document.querySelector('.end-message');
-    if (endMessage) endMessage.remove();
-}
-
+// ========== БЕСКОНЕЧНАЯ ПРОКРУТКА ==========
 function loadMoreArticles() {
     if (isLoading || !hasMore) return;
     
@@ -830,13 +797,10 @@ function loadMoreArticles() {
     fetch(url)
         .then(response => response.json())
         .then(data => {
-            // === ИЗМЕНЕНИЕ: Поддержка разных форматов ответа ===
-            if (data.items && data.items.length > 0) {
-                appendArticles(data.items);
-                currentOffset += data.items.length;
-            } else if (data.articles && data.articles.length > 0) {
-                appendArticles(data.articles);
-                currentOffset += data.articles.length;
+            const items = data.videos || data.articles || [];
+            if (items.length > 0) {
+                appendArticles(items);
+                currentOffset += items.length;
             }
             hasMore = data.has_more;
             
@@ -851,108 +815,58 @@ function loadMoreArticles() {
         .finally(() => { isLoading = false; });
 }
 
-// Переключение вкладок
-document.querySelectorAll('.left-menu-item').forEach(btn => {
-    btn.addEventListener('click', function(e) {
-        e.preventDefault();
-        console.log('Клик по кнопке! feed:', this.dataset.feed);
-        document.querySelectorAll('.left-menu-item').forEach(b => b.classList.remove('active'));
-        this.classList.add('active');
-        
-        currentFeedIndex = this.dataset.feed;
-        currentCategory = '';
-        resetPagination();
-        
-        const grid = document.getElementById('articlesGrid');
-        const sectionHeader = document.querySelector('.section-header');
-        
-        grid.innerHTML = '<div style="text-align: center; padding: 2rem; color: #888;">Загрузка...</div>';
-        
-        fetch(`/api/feed?type=${currentFeedIndex}&offset=0&limit=10`)
-            .then(response => response.json())
-            .then(data => {
-                let title = '', desc = '';
-                if (currentFeedIndex === 'popular') {
-                    title = '<i class="fas fa-fire"></i> Популярные статьи';
-                    desc = 'Самые читаемые статьи на сайте';
-                } else if (currentFeedIndex === 'myfeed') {
-                    title = '<i class="fas fa-rss"></i> Моя лента';
-                    desc = 'Новые статьи от авторов, на которых вы подписаны';
-                } else if (currentFeedIndex === 'videos') {
-                    // === ИЗМЕНЕНИЕ: Заголовок для видео ===
-                    title = '<i class="fas fa-video"></i> Видео';
-                    desc = 'Видео от авторов сообщества';
-                } else {
-                    title = '<i class="fas fa-clock"></i> Последние истории';
-                    desc = 'Свежие публикации от авторов сообщества';
-                }
-                sectionHeader.innerHTML = `<h2>${title}</h2><p>${desc}</p>`;
-                
-                grid.innerHTML = '';
-                
-                // === ИЗМЕНЕНИЕ: Поддержка видео в ответе ===
-                const items = data.videos || data.articles || [];
-                if (items.length === 0) {
-                    const emptyMessage = currentFeedIndex === 'videos' ? 'Пока нет видео' : 'Нет статей';
-                    const emptyIcon = currentFeedIndex === 'videos' ? '🎬' : '📭';
-                    grid.innerHTML = `<div class="empty-state"><div class="empty-state-icon">${emptyIcon}</div><h3>${emptyMessage}</h3><p style="color: #888;">Пока нет контента в этой ленте</p></div>`;
-                } else {
-                    appendArticles(items);
-                    currentOffset = items.length;
-                    hasMore = data.has_more;
-                }
-            })
-            .catch(err => {
-                grid.innerHTML = '<div style="text-align: center; padding: 2rem; color: #ef4444;">Ошибка загрузки</div>';
-            });
-    });
-});
-
-// Переключение ленты из мобильных категорий
-function switchMobileFeedFromTag(feedType) {
-    // Обновляем активную кнопку в мобильных категориях
-    document.querySelectorAll('.mobile-feed-btn').forEach(btn => {
-        btn.classList.remove('active');
-    });
-    document.querySelector(`.mobile-feed-btn[data-feed="${feedType}"]`).classList.add('active');
+// ========== ГЛАВНАЯ ФУНКЦИЯ ПЕРЕКЛЮЧЕНИЯ ЛЕНТЫ (вызывается из base.html) ==========
+window.loadFeedContent = function(feedType) {
+    console.log('📱 Загружаем ленту:', feedType);
     
-    // Обновляем активную кнопку в левом меню
-    document.querySelectorAll('.left-menu-item').forEach(btn => {
+    // 1. Обновляем активные классы в левом меню (на всякий случай)
+    document.querySelectorAll('.left-menu-item').forEach(item => {
+        item.classList.remove('active');
+        if (item.dataset.feed === feedType) {
+            item.classList.add('active');
+        }
+    });
+    
+    // 2. Обновляем активные классы в мобильном меню
+    document.querySelectorAll('.mobile-feed-btn').forEach(btn => {
         btn.classList.remove('active');
         if (btn.dataset.feed === feedType) {
             btn.classList.add('active');
         }
     });
     
-    // Переключаем ленту
+    // 3. Сбрасываем состояние
     currentFeedIndex = feedType;
     currentCategory = '';
     resetPagination();
     
+    // 4. Показываем загрузку
     const grid = document.getElementById('articlesGrid');
     const sectionHeader = document.querySelector('.section-header');
     
     grid.innerHTML = '<div style="text-align: center; padding: 2rem; color: #888;">Загрузка...</div>';
     
+    // 5. Обновляем заголовок
+    let title = '', desc = '';
+    if (feedType === 'popular') {
+        title = '<i class="fas fa-fire"></i> Популярные статьи';
+        desc = 'Самые читаемые статьи на сайте';
+    } else if (feedType === 'myfeed') {
+        title = '<i class="fas fa-rss"></i> Моя лента';
+        desc = 'Новые статьи от авторов, на которых вы подписаны';
+    } else if (feedType === 'videos') {
+        title = '<i class="fas fa-video"></i> Видео';
+        desc = 'Видео от авторов сообщества';
+    } else {
+        title = '<i class="fas fa-clock"></i> Последние истории';
+        desc = 'Свежие публикации от авторов сообщества';
+    }
+    sectionHeader.innerHTML = `<h2>${title}</h2><p>${desc}</p>`;
+    
+    // 6. Загружаем контент
     fetch(`/api/feed?type=${feedType}&offset=0&limit=10`)
         .then(response => response.json())
         .then(data => {
-            let title = '', desc = '';
-            if (feedType === 'popular') {
-                title = '<i class="fas fa-fire"></i> Популярные статьи';
-                desc = 'Самые читаемые статьи на сайте';
-            } else if (feedType === 'myfeed') {
-                title = '<i class="fas fa-rss"></i> Моя лента';
-                desc = 'Новые статьи от авторов, на которых вы подписаны';
-            } else if (feedType === 'videos') {
-                title = '<i class="fas fa-video"></i> Видео';
-                desc = 'Видео от авторов сообщества';
-            } else {
-                title = '<i class="fas fa-clock"></i> Последние истории';
-                desc = 'Свежие публикации от авторов сообщества';
-            }
-            sectionHeader.innerHTML = `<h2>${title}</h2><p>${desc}</p>`;
-            
             grid.innerHTML = '';
             
             const items = data.videos || data.articles || [];
@@ -960,6 +874,7 @@ function switchMobileFeedFromTag(feedType) {
                 const emptyMessage = feedType === 'videos' ? 'Пока нет видео' : 'Нет статей';
                 const emptyIcon = feedType === 'videos' ? '🎬' : '📭';
                 grid.innerHTML = `<div class="empty-state"><div class="empty-state-icon">${emptyIcon}</div><h3>${emptyMessage}</h3><p style="color: #888;">Пока нет контента в этой ленте</p></div>`;
+                hasMore = false;
             } else {
                 appendArticles(items);
                 currentOffset = items.length;
@@ -969,9 +884,40 @@ function switchMobileFeedFromTag(feedType) {
         .catch(err => {
             grid.innerHTML = '<div style="text-align: center; padding: 2rem; color: #ef4444;">Ошибка загрузки</div>';
         });
+};
+
+// ========== ФУНКЦИЯ ДЛЯ МОБИЛЬНОГО МЕНЮ ==========
+function switchMobileFeedFromTag(feedType) {
+    // Просто вызываем основную функцию
+    window.loadFeedContent(feedType);
 }
 
-// Скролл для бесконечной загрузки
+// ========== ИНИЦИАЛИЗАЦИЯ ПРИ ЗАГРУЗКЕ ==========
+document.addEventListener('DOMContentLoaded', function() {
+    // Убеждаемся, что активный класс в левом меню соответствует текущему feed
+    const currentFeed = '{{ feed }}';
+    if (currentFeed) {
+        document.querySelectorAll('.left-menu-item').forEach(item => {
+            item.classList.remove('active');
+            if (item.dataset.feed === currentFeed) {
+                item.classList.add('active');
+            }
+        });
+    }
+    
+    // Привязываем обработчики к левому меню (на случай если onclick не сработал)
+    document.querySelectorAll('.left-menu-item').forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            const feedType = this.dataset.feed;
+            if (feedType) {
+                e.preventDefault();
+                window.loadFeedContent(feedType);
+            }
+        });
+    });
+});
+
+// ========== СКРОЛЛ ДЛЯ БЕСКОНЕЧНОЙ ЗАГРУЗКИ ==========
 let scrollTimeout;
 window.addEventListener('scroll', function() {
     if (scrollTimeout) clearTimeout(scrollTimeout);
