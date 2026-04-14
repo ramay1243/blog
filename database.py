@@ -69,6 +69,7 @@ class PasswordReset(Base):
     id = Column(Integer, primary_key=True)
     user_id = Column(Integer, ForeignKey('users.id'))
     code = Column(String, unique=True)
+    token = Column(String(100), unique=True)
     expires_at = Column(DateTime, default=lambda: datetime.now() + timedelta(hours=1))
     used = Column(Boolean, default=False)
     created_at = Column(DateTime, default=datetime.now)
