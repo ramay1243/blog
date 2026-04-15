@@ -643,7 +643,8 @@
     right: 0;
     background: #000;
     border-bottom: 2px solid #ff8c00;
-    padding: 0.8rem 1.2rem;
+    padding: 0 1.2rem;  /* убрали вертикальные отступы */
+    height: 60px;       /* фиксированная высота */
     z-index: 1000;
     align-items: center;
     justify-content: space-between;
@@ -1209,7 +1210,7 @@ body.menu-open {
         <i class="fas fa-bars"></i>
     </button>
     <a href="/" class="mobile-logo">
-    <img src="/static/logo.png" alt="scribli" style="height: 60px; width: auto;">
+    <img src="/static/logo.png" alt="scribli" style="height: 32px; width: auto;">
 </a>
     <div class="mobile-header-actions">
         {% if user %}
