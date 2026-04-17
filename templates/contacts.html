@@ -25,6 +25,13 @@
         border: 1px solid rgba(255, 140, 0, 0.2);
         width: 100%;
     }
+
+    .contacts-intro {
+        color: #a8a8a8;
+        margin-bottom: 1.3rem;
+        line-height: 1.55;
+        font-size: 0.95rem;
+    }
     
     .contact-item {
         display: flex;
@@ -98,11 +105,60 @@
         color: #000;
         transform: translateY(-3px);
     }
+
+    .feedback-panel {
+        margin-top: 1.5rem;
+        background: linear-gradient(135deg, rgba(255,140,0,0.08) 0%, rgba(255,140,0,0.03) 100%);
+        border: 1px solid rgba(255, 140, 0, 0.2);
+        border-radius: 18px;
+        padding: 1.2rem;
+    }
+
+    .feedback-panel h2 {
+        color: #ffb347;
+        font-size: 1.15rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .feedback-panel p,
+    .feedback-panel li {
+        color: #cfcfcf;
+        line-height: 1.55;
+        font-size: 0.9rem;
+    }
+
+    .feedback-panel ul {
+        margin: 0.7rem 0 0 1.1rem;
+    }
+
+    .feedback-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1rem;
+        margin-top: 1rem;
+    }
+
+    .feedback-box {
+        background: #111;
+        border: 1px solid rgba(255, 140, 0, 0.15);
+        border-radius: 14px;
+        padding: 1rem;
+    }
+
+    .feedback-box h3 {
+        color: #ffd08b;
+        font-size: 1rem;
+        margin-bottom: 0.4rem;
+    }
     
     @media (max-width: 768px) {
         .contact-item {
             flex-direction: column;
             text-align: center;
+        }
+
+        .feedback-grid {
+            grid-template-columns: 1fr;
         }
     }
 </style>
@@ -113,13 +169,18 @@
     </div>
     
     <div class="contacts-card">
+        <p class="contacts-intro">
+            Если вы нашли ошибку, хотите предложить новую функцию, сообщить о проблеме с публикацией
+            или просто задать вопрос по платформе, свяжитесь с нами любым удобным способом.
+        </p>
+
         <div class="contact-item">
             <div class="contact-icon">
                 <i class="fas fa-envelope"></i>
             </div>
             <div class="contact-info">
                 <h3>Email</h3>
-                <p><a href="mailto:support@storyblog.ru">support@storyblog.ru</a></p>
+                <p><a href="mailto:support@scribli.ru">support@scribli.ru</a></p>
             </div>
         </div>
         
@@ -129,7 +190,7 @@
             </div>
             <div class="contact-info">
                 <h3>Telegram</h3>
-                <p><a href="#">@storyblog_support</a></p>
+                <p><a href="#">@scribli_support</a></p>
             </div>
         </div>
         
@@ -139,7 +200,7 @@
             </div>
             <div class="contact-info">
                 <h3>ВКонтакте</h3>
-                <p><a href="#">vk.com/storyblog</a></p>
+                <p><a href="#">vk.com/scribli</a></p>
             </div>
         </div>
         
@@ -148,6 +209,36 @@
             <a href="#" class="social-link"><i class="fab fa-vk"></i></a>
             <a href="#" class="social-link"><i class="fab fa-youtube"></i></a>
             <a href="#" class="social-link"><i class="fab fa-github"></i></a>
+        </div>
+
+        <div class="feedback-panel">
+            <h2><i class="fas fa-bug"></i> Обратная связь и сообщения об ошибках</h2>
+            <p>
+                scribli активно развивается, поэтому ваши сообщения особенно важны. Чем точнее вы опишете проблему,
+                тем быстрее мы сможем её проверить и исправить.
+            </p>
+
+            <div class="feedback-grid">
+                <div class="feedback-box">
+                    <h3>Что написать в сообщении</h3>
+                    <ul>
+                        <li>Что именно произошло и на какой странице.</li>
+                        <li>Какие действия вы сделали перед ошибкой.</li>
+                        <li>Какое устройство и браузер используете.</li>
+                        <li>Скриншот или текст ошибки, если он появился.</li>
+                    </ul>
+                </div>
+
+                <div class="feedback-box">
+                    <h3>Что ещё можно присылать</h3>
+                    <ul>
+                        <li>Идеи новых функций для авторов и читателей.</li>
+                        <li>Предложения по дизайну и удобству интерфейса.</li>
+                        <li>Жалобы на некорректный контент или спам.</li>
+                        <li>Замечания по работе публикаций, комментариев и видео.</li>
+                    </ul>
+                </div>
+            </div>
         </div>
     </div>
 </div>

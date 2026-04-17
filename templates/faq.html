@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+
+{% block content %}
+<style>
+.help-wrap { max-width: 980px; margin: 0 auto; }
+.help-hero { background: linear-gradient(135deg, #111 0%, #1a0a00 100%); border: 1px solid rgba(255,140,0,.3); border-radius: 18px; padding: 1.4rem; margin-bottom: 1.2rem; }
+.help-hero h1 { color: #ffb347; margin-bottom: .4rem; font-size: 1.5rem; }
+.help-hero p { color: #cfcfcf; font-size: .95rem; line-height: 1.5; }
+.faq-list { display: grid; gap: .8rem; }
+.faq-item { background: #111; border: 1px solid rgba(255,140,0,.18); border-radius: 14px; padding: 1rem; }
+.faq-item h3 { color: #ffcc80; margin-bottom: .35rem; font-size: 1rem; }
+.faq-item p { color: #d3d3d3; font-size: .9rem; line-height: 1.5; }
+.help-tip { margin-top: 1rem; border-left: 3px solid #ff8c00; padding-left: .8rem; color: #bdbdbd; font-size: .86rem; }
+@media (max-width: 768px){ .help-hero h1 { font-size: 1.2rem; } .faq-item h3 { font-size: .95rem; } }
+</style>
+
+<div class="help-wrap">
+    <section class="help-hero">
+        <h1>Помощь и FAQ</h1>
+        <p>Здесь собраны ответы на частые вопросы по публикации, форматированию материалов и работе с профилем автора на scribli.</p>
+    </section>
+
+    <section class="faq-list">
+        <article class="faq-item">
+            <h3>Как опубликовать статью?</h3>
+            <p>Нажмите «Написать», заполните заголовок, текст и категорию. Если материал готов — публикуйте сразу, если нет — сохраните как черновик и вернитесь позже.</p>
+        </article>
+        <article class="faq-item">
+            <h3>Как красиво форматировать текст?</h3>
+            <p>Используйте редактор: подзаголовки, списки, выделение ключевых мыслей. Делите длинный текст на смысловые блоки по 2–4 абзаца, чтобы материал читался легче.</p>
+        </article>
+        <article class="faq-item">
+            <h3>Какая длина статьи оптимальна?</h3>
+            <p>Для полезного и глубокого материала обычно хорошо работает 4 000–8 000 знаков. Важно не количество, а польза: конкретика, примеры и структура.</p>
+        </article>
+        <article class="faq-item">
+            <h3>Можно ли редактировать публикацию после выхода?</h3>
+            <p>Да. В профиле автора откройте список своих публикаций и выберите «Редактировать». После изменений проверьте заголовок и описание, чтобы не потерять смысл.</p>
+        </article>
+        <article class="faq-item">
+            <h3>Что делать, если публикация не набирает просмотры?</h3>
+            <p>Улучшите заголовок, первые 2 абзаца и добавьте ясную пользу для читателя. Используйте релевантные категории и публикуйте регулярно — это повышает вовлечение.</p>
+        </article>
+        <article class="faq-item">
+            <h3>Как пожаловаться на нарушение?</h3>
+            <p>Откройте материал и отправьте жалобу с кратким объяснением. Команда модерации проверит сообщение и примет решение по правилам сообщества.</p>
+        </article>
+    </section>
+
+    <p class="help-tip">Не нашли ответ? Напишите нам через раздел «Обратная связь» — это самый быстрый способ получить помощь.</p>
+</div>
+{% endblock %}

@@ -3,8 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}scribli — истории, статьи, блоги и видео{% endblock %}</title>
+    <title>{% block title %}{{ meta_title|default('scribli — истории, статьи, блоги и видео') }}{% endblock %}</title>
     <meta name="description" content="{{ meta_description|default('scribli — платформа для историй, статей, блогов и видео. Читайте, смотрите, пишите, комментируйте. Присоединяйтесь к сообществу авторов!') }}">
+    <meta name="robots" content="{{ meta_robots|default('index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1') }}">
+    <meta name="author" content="scribli">
+    <meta name="theme-color" content="#0a0a0a">
+    <link rel="canonical" href="{{ canonical_url|default((request.url|string).split('?')[0] if request else 'https://scribli.ru/') }}">
     <link rel="icon" type="image/png" href="/static/favicon.png">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
     <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
@@ -1199,30 +1203,134 @@ body.menu-open {
         display: block;
     }
 }
+/* Модальное объявление на главной */
+.site-announcement-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.72);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 3000;
+    padding: 1rem;
+}
+
+.site-announcement-overlay.hidden {
+    display: none;
+}
+
+.site-announcement-modal {
+    width: 100%;
+    max-width: 560px;
+    background: linear-gradient(180deg, #111 0%, #0b0b0b 100%);
+    border: 1px solid rgba(255, 140, 0, 0.35);
+    border-radius: 18px;
+    box-shadow: 0 18px 45px rgba(0, 0, 0, 0.5);
+    color: #eaeaea;
+    position: relative;
+    padding: 1.2rem 1.2rem 1rem;
+}
+
+.site-announcement-close {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    width: 34px;
+    height: 34px;
+    border: none;
+    border-radius: 50%;
+    background: #1d1d1d;
+    color: #ff8c00;
+    font-size: 1.05rem;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.site-announcement-close:hover {
+    background: #2a2a2a;
+    transform: scale(1.05);
+}
+
+.site-announcement-title {
+    font-size: 1.16rem;
+    font-weight: 700;
+    color: #ffb347;
+    margin-bottom: 0.5rem;
+    padding-right: 2rem;
+}
+
+.site-announcement-text {
+    color: #cfcfcf;
+    font-size: 0.95rem;
+    line-height: 1.5;
+}
+
+.site-announcement-actions {
+    margin-top: 0.9rem;
+    display: flex;
+    gap: 0.6rem;
+    justify-content: flex-end;
+}
+
+.site-announcement-btn {
+    border: none;
+    border-radius: 10px;
+    background: #ff8c00;
+    color: #111;
+    font-weight: 700;
+    font-size: 0.88rem;
+    padding: 0.55rem 0.95rem;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.site-announcement-btn:hover {
+    background: #ffa233;
+}
+
+.site-announcement-btn-secondary {
+    background: transparent;
+    color: #cfcfcf;
+    border: 1px solid #444;
+}
+
+.site-announcement-btn-secondary:hover {
+    background: #1b1b1b;
+    border-color: #666;
+}
+
+@media (max-width: 768px) {
+    .site-announcement-modal {
+        max-width: 100%;
+        border-radius: 14px;
+        padding: 1rem;
+    }
+
+    .site-announcement-title {
+        font-size: 1.02rem;
+    }
+
+    .site-announcement-text {
+        font-size: 0.88rem;
+    }
+}
     </style>
-        <!-- SEO мета-теги -->
-    <link rel="canonical" href="https://scribli.ru/">
-    <meta name="robots" content="index, follow">
-    <meta name="author" content="scribli">
     <meta name="keywords" content="истории, блог, статьи, рассказы, сообщество авторов, читать истории, scribli, платформа для историй, видео, смотреть видео, видеоблог, видеоконтент, блоги, ведение блога, публикация статей">
     
-    <!-- Open Graph для соцсетей (уже есть, проверьте) -->
-    <meta property="og:title" content="scribli — истории, статьи, блоги и видео">
-    <meta property="og:description" content="Читайте истории, смотрите видео, пишите статьи и блоги на scribli">
-    <meta property="og:image" content="https://scribli.ru/static/og-image.png">
+    <meta property="og:site_name" content="scribli">
+    <meta property="og:locale" content="ru_RU">
+    <meta property="og:title" content="{{ meta_title|default('scribli — истории, статьи, блоги и видео') }}">
+    <meta property="og:description" content="{{ meta_description|default('Читайте истории, смотрите видео, пишите статьи и блоги на scribli') }}">
+    <meta property="og:image" content="{{ og_image|default('https://scribli.ru/static/og-image.png') }}">
+    <meta property="og:url" content="{{ canonical_url|default('https://scribli.ru/') }}">
 
-    <!-- Дополнительно для видео -->
-    <meta property="og:type" content="website">
-    <meta property="og:video" content="https://scribli.ru/static/video-preview.mp4">
-    <meta property="og:video:type" content="video/mp4">
-    <meta property="og:video:width" content="1280">
-    <meta property="og:video:height" content="720">
+    <meta property="og:type" content="{{ og_type|default('website') }}">
     
     <!-- Twitter Card -->
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="scribli — истории и блоги">
-    <meta name="twitter:description" content="Читайте истории, делитесь мыслями, находите единомышленников">
-    <meta name="twitter:image" content="https://scribli.ru/static/og-image.png">
+    <meta name="twitter:title" content="{{ meta_title|default('scribli — истории и блоги') }}">
+    <meta name="twitter:description" content="{{ meta_description|default('Читайте истории, делитесь мыслями, находите единомышленников') }}">
+    <meta name="twitter:image" content="{{ og_image|default('https://scribli.ru/static/og-image.png') }}">
     
     <!-- Schema.org разметка -->
     <script type="application/ld+json">
@@ -1230,7 +1338,7 @@ body.menu-open {
     "@context": "https://schema.org",
     "@type": "WebSite",
     "name": "scribli",
-    "url": "https://scribli.ru/",
+        "url": "{{ site_url|default('https://scribli.ru') }}/",
     "description": "Платформа для историй, статей, блогов и видео. Читайте, смотрите, пишите, комментируйте.",
     "potentialAction": {
         "@type": "SearchAction",
@@ -1268,7 +1376,7 @@ body.menu-open {
         <i class="fas fa-bars"></i>
     </button>
     <a href="/" class="mobile-logo">
-    <img src="/static/logo.png" alt="scribli" style="height: 80px; width: auto;">
+            <img src="/static/logo.png" alt="scribli" style="height: 80px; width: auto;" loading="eager" fetchpriority="high">
 </a>
     <div class="mobile-header-actions">
         {% if user %}
@@ -1345,6 +1453,23 @@ body.menu-open {
     </div>
 </div>
 
+{% if request.url.path == "/" %}
+<div id="siteAnnouncement" class="site-announcement-overlay" role="dialog" aria-modal="true" aria-label="Информация о запуске сайта">
+    <div class="site-announcement-modal">
+        <button type="button" class="site-announcement-close" onclick="closeSiteAnnouncement()" aria-label="Закрыть">✕</button>
+        <div class="site-announcement-title">Сайт недавно запущен</div>
+        <div class="site-announcement-text">
+            Платформа сейчас проходит этап тестирования. Возможны небольшие ошибки или изменения в интерфейсе.
+            Спасибо, что помогаете нам сделать сайт лучше.
+        </div>
+        <div class="site-announcement-actions">
+            <button type="button" class="site-announcement-btn site-announcement-btn-secondary" onclick="hideSiteAnnouncementForever()">Больше не показывать</button>
+            <button type="button" class="site-announcement-btn" onclick="closeSiteAnnouncement()">Понятно</button>
+        </div>
+    </div>
+</div>
+{% endif %}
+
 <!-- ========== ВЫЕЗЖАЮЩЕЕ МЕНЮ ========== -->
 <div class="mobile-overlay" id="mobileOverlay" onclick="closeMobileMenu()"></div>
 
@@ -1398,6 +1523,15 @@ body.menu-open {
         <a href="/about" class="mobile-menu-item">
             <i class="fas fa-info-circle"></i> О сайте
         </a>
+        <a href="/faq" class="mobile-menu-item">
+            <i class="fas fa-circle-question"></i> Помощь / FAQ
+        </a>
+        <a href="/community-rules" class="mobile-menu-item">
+            <i class="fas fa-scale-balanced"></i> Правила сообщества
+        </a>
+        <a href="/changelog" class="mobile-menu-item">
+            <i class="fas fa-clock-rotate-left"></i> Что нового
+        </a>
         <a href="/contacts" class="mobile-menu-item">
             <i class="fas fa-envelope"></i> Контакты
         </a>
@@ -1426,7 +1560,7 @@ body.menu-open {
 <nav class="navbar">
     <h2 style="margin-left: 9rem;">
         <a href="/">
-            <img src="/static/logo.png" alt="scribli" style="height: 100px; width: auto; vertical-align: middle;">
+            <img src="/static/logo.png" alt="scribli" style="height: 100px; width: auto; vertical-align: middle;" loading="eager" fetchpriority="high">
         </a>
     </h2>
         <div class="nav-links">
@@ -1763,6 +1897,15 @@ if (document.getElementById('heroSliderTrack')) {
         <a href="/about" class="menu-footer-item">
             <i class="fas fa-info-circle"></i> О сайте
         </a>
+        <a href="/faq" class="menu-footer-item">
+            <i class="fas fa-circle-question"></i> Помощь / FAQ
+        </a>
+        <a href="/community-rules" class="menu-footer-item">
+            <i class="fas fa-scale-balanced"></i> Правила сообщества
+        </a>
+        <a href="/changelog" class="menu-footer-item">
+            <i class="fas fa-clock-rotate-left"></i> Что нового
+        </a>
         <a href="/contacts" class="menu-footer-item">
             <i class="fas fa-envelope"></i> Контакты
         </a>
@@ -2082,6 +2225,36 @@ function switchFeed(feedType) {
         window.location.href = '/?feed=' + feedType;
     }
 }
+</script>
+<script>
+function closeSiteAnnouncement() {
+    const popup = document.getElementById('siteAnnouncement');
+    if (!popup) return;
+    popup.classList.add('hidden');
+}
+
+function hideSiteAnnouncementForever() {
+    const popup = document.getElementById('siteAnnouncement');
+    if (!popup) return;
+    popup.classList.add('hidden');
+    try {
+        localStorage.setItem('siteAnnouncementHiddenForever', '1');
+    } catch (e) {
+        // localStorage может быть недоступен, просто скрываем блок.
+    }
+}
+
+document.addEventListener('DOMContentLoaded', function () {
+    const popup = document.getElementById('siteAnnouncement');
+    if (!popup) return;
+    try {
+        if (localStorage.getItem('siteAnnouncementHiddenForever') === '1') {
+            popup.classList.add('hidden');
+        }
+    } catch (e) {
+        // Игнорируем ошибки localStorage.
+    }
+});
 </script>
 </body>
 </html>

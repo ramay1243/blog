@@ -1,5 +1,5 @@
 from fastapi import FastAPI, Request, Form, Depends, HTTPException, UploadFile, File
-from fastapi.responses import HTMLResponse, RedirectResponse
+from fastapi.responses import HTMLResponse, RedirectResponse, Response
 from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
 from sqlalchemy.orm import Session
@@ -15,6 +15,7 @@ import uuid
 import random
 import string
 import re
+from xml.sax.saxutils import escape
 
 def clean_html(text):
     """Удаляет HTML-теги из текста"""
@@ -22,7 +23,7 @@ def clean_html(text):
         return ""
     return re.sub(r'<[^>]+>', '', text)
 
-app = FastAPI(title="StoryBlog - Платформа для историй")
+app = FastAPI(title="scribli - Платформа для историй")
 app.mount("/static", StaticFiles(directory="static"), name="static")
 app.mount("/uploads", StaticFiles(directory="uploads"), name="uploads")
 templates = Jinja2Templates(directory="templates")
@@ -31,6 +32,34 @@ templates = Jinja2Templates(directory="templates")
 SECRET_KEY = "your-secret-key-change-this-12345"
 ALGORITHM = "HS256"
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+SITE_URL = os.getenv("SITE_URL", "https://scribli.ru").rstrip("/")
+
+
+def with_seo(
+    request: Request,
+    *,
+    meta_title: str,
+    meta_description: str,
+    canonical_path: str = "",
+    meta_robots: str = "index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1",
+    og_type: str = "website",
+    og_image: str = "/static/og-image.png",
+):
+    canonical_url = f"{SITE_URL}{canonical_path}" if canonical_path else str(request.url).split("?")[0]
+    if og_image.startswith("http://") or og_image.startswith("https://"):
+        og_image_url = og_image
+    else:
+        og_image_url = f"{SITE_URL}{og_image if og_image.startswith('/') else '/' + og_image}"
+
+    return {
+        "meta_title": meta_title,
+        "meta_description": meta_description,
+        "meta_robots": meta_robots,
+        "canonical_url": canonical_url,
+        "og_type": og_type,
+        "og_image": og_image_url,
+        "site_url": SITE_URL,
+    }
 
 def create_notification(db: Session, user_id: int, from_user_id: int, article_id: int, type: str, message: str, link: str = ""):
     if user_id == from_user_id:
@@ -153,6 +182,13 @@ async def home(request: Request, category: str = None, feed: str = "fresh", db: 
     comments = db.query(Comment).all()
     slider_items = db.query(SliderItem).filter(SliderItem.is_active == True).order_by(SliderItem.order).all()
     
+    seo = with_seo(
+        request,
+        meta_title=f"{selected_category.name} - scribli" if selected_category else "scribli - Истории, статьи, блоги и видео",
+        meta_description=f"Статьи в категории {selected_category.name}" if selected_category else "Платформа для публикации личных историй, статей и видео.",
+        canonical_path="/" if not category and feed == "fresh" else "",
+    )
+
     return templates.TemplateResponse("index.html", {
         "request": request,
         "articles": articles,
@@ -164,8 +200,7 @@ async def home(request: Request, category: str = None, feed: str = "fresh", db: 
         "popular_articles": popular_articles,
         "top_authors": top_authors,
         "feed": feed,  # ← ВАЖНО: добавьте эту строку
-        "meta_title": f"{selected_category.name} - StoryBlog" if selected_category else "StoryBlog - Истории и блоги",
-        "meta_description": f"Статьи в категории {selected_category.name}" if selected_category else "Платформа для публикации личных историй"
+        **seo
     })
 
 # ============ РЕГИСТРАЦИЯ И ЛОГИН ============
@@ -173,7 +208,18 @@ async def home(request: Request, category: str = None, feed: str = "fresh", db: 
 async def register_page(request: Request, db: Session = Depends(get_db)):
     user = get_current_user(request, db)
     slider_items = db.query(SliderItem).filter(SliderItem.is_active == True).order_by(SliderItem.order).all()
-    return templates.TemplateResponse("register.html", {"request": request, "user": user, "slider_items": slider_items})
+    return templates.TemplateResponse("register.html", {
+        "request": request,
+        "user": user,
+        "slider_items": slider_items,
+        **with_seo(
+            request,
+            meta_title="Регистрация - scribli",
+            meta_description="Создайте аккаунт автора в scribli.",
+            canonical_path="/register",
+            meta_robots="noindex,nofollow",
+        ),
+    })
 
 @app.post("/register")
 async def register(
@@ -207,7 +253,18 @@ async def register(
 async def login_page(request: Request, db: Session = Depends(get_db)):
     user = get_current_user(request, db)
     slider_items = db.query(SliderItem).filter(SliderItem.is_active == True).order_by(SliderItem.order).all()
-    return templates.TemplateResponse("login.html", {"request": request, "user": user, "slider_items": slider_items})
+    return templates.TemplateResponse("login.html", {
+        "request": request,
+        "user": user,
+        "slider_items": slider_items,
+        **with_seo(
+            request,
+            meta_title="Вход - scribli",
+            meta_description="Войдите в аккаунт scribli.",
+            canonical_path="/login",
+            meta_robots="noindex,nofollow",
+        ),
+    })
 
 @app.post("/login")
 async def login(
@@ -271,7 +328,14 @@ async def profile(request: Request, db: Session = Depends(get_db)):
         "user_videos": user_videos, 
         "subscribers_count": subscribers_count,
         "subscriptions_count": subscriptions_count,
-        "slider_items": slider_items
+        "slider_items": slider_items,
+        **with_seo(
+            request,
+            meta_title=f"Профиль {user.username} - scribli",
+            meta_description="Личный кабинет пользователя scribli.",
+            canonical_path="/profile",
+            meta_robots="noindex,nofollow",
+        ),
     })
 
 @app.post("/profile/edit")
@@ -496,8 +560,13 @@ async def article_detail(request: Request, slug: str, db: Session = Depends(get_
         "total_views": total_views,
         "total_likes": total_likes,
         "slider_items": slider_items,
-        "meta_title": article.title,
-        "meta_description": article.description
+        **with_seo(
+            request,
+            meta_title=f"{article.title} - scribli",
+            meta_description=article.description or "Статья на scribli",
+            canonical_path=f"/article/{article.slug}",
+            og_type="article",
+        ),
     })
 
 # ============ ЛАЙКИ И КОММЕНТАРИИ ============
@@ -1053,8 +1122,13 @@ async def search(request: Request, q: str = "", db: Session = Depends(get_db)):
         "search_query": search_query,
         "results_count": len(results),
         "slider_items": slider_items,
-        "meta_title": f"Поиск: {search_query}" if search_query else "Поиск",
-        "meta_description": "Поиск статей на сайте"
+        **with_seo(
+            request,
+            meta_title=f"Поиск: {search_query}" if search_query else "Поиск по сайту - scribli",
+            meta_description="Поиск статей и видео на сайте scribli.",
+            canonical_path="/search",
+            meta_robots="noindex,follow",
+        ),
     })
 
 # ============ УВЕДОМЛЕНИЯ ============
@@ -1255,8 +1329,12 @@ async def user_profile(request: Request, user_id: int, db: Session = Depends(get
         "is_subscribed": is_subscribed,
         "subscribers_count": subscribers_count,
         "slider_items": slider_items,
-        "meta_title": f"{author.username} — статьи и публикации",
-        "meta_description": f"Все статьи автора {author.username}"
+        **with_seo(
+            request,
+            meta_title=f"{author.username} — статьи и публикации",
+            meta_description=f"Все статьи автора {author.username}.",
+            canonical_path=f"/user/{author.id}",
+        ),
     })
 
 @app.get("/my-subscriptions", response_class=HTMLResponse)
@@ -1473,8 +1551,12 @@ async def about_page(request: Request, db: Session = Depends(get_db)):
         "request": request,
         "user": user,
         "slider_items": slider_items,
-        "meta_title": "О сайте - StoryBlog",
-        "meta_description": "Узнайте больше о платформе StoryBlog"
+        **with_seo(
+            request,
+            meta_title="О сайте - scribli",
+            meta_description="Узнайте больше о платформе scribli.",
+            canonical_path="/about",
+        ),
     })
 
 @app.get("/contacts", response_class=HTMLResponse)
@@ -1485,8 +1567,12 @@ async def contacts_page(request: Request, db: Session = Depends(get_db)):
         "request": request,
         "user": user,
         "slider_items": slider_items,
-        "meta_title": "Контакты - StoryBlog",
-        "meta_description": "Свяжитесь с нами"
+        **with_seo(
+            request,
+            meta_title="Контакты - scribli",
+            meta_description="Свяжитесь с командой scribli.",
+            canonical_path="/contacts",
+        ),
     })
 
 @app.get("/privacy", response_class=HTMLResponse)
@@ -1497,8 +1583,69 @@ async def privacy_page(request: Request, db: Session = Depends(get_db)):
         "request": request,
         "user": user,
         "slider_items": slider_items,
-        "meta_title": "Политика конфиденциальности - StoryBlog",
-        "meta_description": "Правила обработки персональных данных"
+        **with_seo(
+            request,
+            meta_title="Политика конфиденциальности - scribli",
+            meta_description="Правила обработки персональных данных на scribli.",
+            canonical_path="/privacy",
+            meta_robots="noindex,follow",
+        ),
+    })
+
+
+@app.get("/faq", response_class=HTMLResponse)
+async def faq_page(request: Request, db: Session = Depends(get_db)):
+    user = get_current_user(request, db)
+    slider_items = db.query(SliderItem).filter(SliderItem.is_active == True).order_by(SliderItem.order).all()
+    return templates.TemplateResponse("faq.html", {
+        "request": request,
+        "user": user,
+        "slider_items": slider_items,
+        **with_seo(
+            request,
+            meta_title="Помощь и FAQ - scribli",
+            meta_description="Как публиковать статьи и видео, форматировать материалы и пользоваться возможностями scribli.",
+            canonical_path="/faq",
+        ),
+    })
+
+
+@app.get("/community-rules", response_class=HTMLResponse)
+async def community_rules_page(request: Request, db: Session = Depends(get_db)):
+    user = get_current_user(request, db)
+    slider_items = db.query(SliderItem).filter(SliderItem.is_active == True).order_by(SliderItem.order).all()
+    return templates.TemplateResponse("community_rules.html", {
+        "request": request,
+        "user": user,
+        "slider_items": slider_items,
+        **with_seo(
+            request,
+            meta_title="Правила сообщества - scribli",
+            meta_description="Правила публикации контента и общения в комментариях на платформе scribli.",
+            canonical_path="/community-rules",
+        ),
+    })
+
+
+@app.get("/feedback", response_class=HTMLResponse)
+async def feedback_page(request: Request, db: Session = Depends(get_db)):
+    return RedirectResponse(url="/contacts", status_code=301)
+
+
+@app.get("/changelog", response_class=HTMLResponse)
+async def changelog_page(request: Request, db: Session = Depends(get_db)):
+    user = get_current_user(request, db)
+    slider_items = db.query(SliderItem).filter(SliderItem.is_active == True).order_by(SliderItem.order).all()
+    return templates.TemplateResponse("changelog.html", {
+        "request": request,
+        "user": user,
+        "slider_items": slider_items,
+        **with_seo(
+            request,
+            meta_title="Что нового - scribli",
+            meta_description="История обновлений и улучшений платформы scribli.",
+            canonical_path="/changelog",
+        ),
     })
 
 # ============ API ============
@@ -1751,8 +1898,13 @@ async def videos_page(request: Request, db: Session = Depends(get_db)):
         "user": user,
         "videos": videos,
         "slider_items": slider_items,
-        "meta_title": "Видео - StoryBlog",
-        "meta_description": "Видео от авторов StoryBlog"
+        **with_seo(
+            request,
+            meta_title="Видео - scribli",
+            meta_description="Видео от авторов scribli.",
+            canonical_path="/videos",
+            og_type="video.other",
+        ),
     })
 
 # ============ ЛАЙКИ ВИДЕО ============
@@ -1920,9 +2072,79 @@ async def video_detail(request: Request, video_id: int, db: Session = Depends(ge
         "is_subscribed": is_subscribed,
         "is_bookmarked": is_bookmarked,
         "slider_items": slider_items,
-        "meta_title": video.title,
-        "meta_description": video.description[:150] if video.description else ""
+        **with_seo(
+            request,
+            meta_title=f"{video.title} - scribli",
+            meta_description=(video.description[:150] if video.description else "Видео на scribli."),
+            canonical_path=f"/video/{video.id}",
+            og_type="video.other",
+            og_image=video.thumbnail_url if video.thumbnail_url else "/static/og-image.png",
+        ),
     })
+
+
+@app.get("/robots.txt")
+async def robots_txt():
+    content = "\n".join([
+        "User-agent: *",
+        "Allow: /",
+        "Disallow: /admin",
+        "Disallow: /profile",
+        "Disallow: /settings",
+        "Disallow: /login",
+        "Disallow: /register",
+        "Disallow: /search",
+        "Disallow: /api/",
+        f"Sitemap: {SITE_URL}/sitemap.xml",
+    ])
+    return Response(content=content, media_type="text/plain; charset=utf-8")
+
+
+@app.get("/sitemap.xml")
+async def sitemap_xml(db: Session = Depends(get_db)):
+    static_urls = [
+        ("/", datetime.utcnow()),
+        ("/videos", datetime.utcnow()),
+        ("/about", datetime.utcnow()),
+        ("/faq", datetime.utcnow()),
+        ("/community-rules", datetime.utcnow()),
+        ("/feedback", datetime.utcnow()),
+        ("/changelog", datetime.utcnow()),
+        ("/contacts", datetime.utcnow()),
+        ("/privacy", datetime.utcnow()),
+    ]
+
+    published_articles = db.query(Article).filter(Article.is_published == True).all()
+    published_videos = db.query(Video).filter(Video.is_published == True).all()
+    public_authors = db.query(User).filter(User.is_active == True).all()
+
+    urls = []
+    for path, lastmod in static_urls:
+        urls.append((f"{SITE_URL}{path}", lastmod, "daily", "1.0" if path == "/" else "0.8"))
+
+    for article in published_articles:
+        lastmod = article.updated_at or article.created_at or datetime.utcnow()
+        urls.append((f"{SITE_URL}/article/{article.slug}", lastmod, "weekly", "0.8"))
+
+    for video in published_videos:
+        lastmod = video.updated_at or video.created_at or datetime.utcnow()
+        urls.append((f"{SITE_URL}/video/{video.id}", lastmod, "weekly", "0.7"))
+
+    for author in public_authors:
+        urls.append((f"{SITE_URL}/user/{author.id}", author.created_at or datetime.utcnow(), "weekly", "0.6"))
+
+    xml_lines = ['<?xml version="1.0" encoding="UTF-8"?>', '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">']
+    for loc, lastmod, changefreq, priority in urls:
+        xml_lines.extend([
+            "  <url>",
+            f"    <loc>{escape(loc)}</loc>",
+            f"    <lastmod>{lastmod.date().isoformat()}</lastmod>",
+            f"    <changefreq>{changefreq}</changefreq>",
+            f"    <priority>{priority}</priority>",
+            "  </url>",
+        ])
+    xml_lines.append("</urlset>")
+    return Response(content="\n".join(xml_lines), media_type="application/xml")
 
 @app.get("/create-video", response_class=HTMLResponse)
 async def create_video_page(request: Request, db: Session = Depends(get_db)):

@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+
+{% block content %}
+<style>
+.ch-wrap { max-width: 980px; margin: 0 auto; }
+.ch-hero { background: linear-gradient(135deg, #111 0%, #1a0a00 100%); border: 1px solid rgba(255,140,0,.3); border-radius: 18px; padding: 1.4rem; margin-bottom: 1rem; }
+.ch-hero h1 { color: #ffb347; margin-bottom: .45rem; font-size: 1.45rem; }
+.ch-hero p { color: #cfcfcf; line-height: 1.5; font-size: .92rem; }
+.ch-list { display: grid; gap: .8rem; }
+.ch-item { background: #111; border: 1px solid rgba(255,140,0,.18); border-radius: 14px; padding: 1rem; }
+.ch-date { color: #ffb347; font-weight: 700; margin-bottom: .35rem; font-size: .9rem; }
+.ch-item h3 { color: #ffd08b; margin-bottom: .35rem; font-size: 1rem; }
+.ch-item ul { margin-left: 1rem; }
+.ch-item li { color: #d4d4d4; line-height: 1.45; font-size: .9rem; margin-bottom: .2rem; }
+.ch-note { margin-top: 1rem; border-left: 3px solid #ff8c00; padding-left: .8rem; color: #bdbdbd; font-size: .85rem; }
+@media (max-width: 768px){ .ch-hero h1 { font-size: 1.15rem; } }
+</style>
+
+<div class="ch-wrap">
+    <section class="ch-hero">
+        <h1>Что нового в scribli</h1>
+        <p>Публикуем ключевые улучшения платформы, чтобы авторы и читатели понимали, что меняется и что мы развиваем дальше.</p>
+    </section>
+
+    <section class="ch-list">
+        <article class="ch-item">
+            <div class="ch-date">17.04.2026</div>
+            <h3>Навигация и новые служебные страницы</h3>
+            <ul>
+                <li>Добавлены страницы «Помощь / FAQ», «Правила сообщества», «Обратная связь», «Что нового».</li>
+                <li>Новые разделы доступны и на десктопе, и на мобильных устройствах.</li>
+                <li>Улучшена информативность для новых пользователей и авторов.</li>
+            </ul>
+        </article>
+
+        <article class="ch-item">
+            <div class="ch-date">17.04.2026</div>
+            <h3>SEO и индексация</h3>
+            <ul>
+                <li>Добавлены динамические мета-теги и canonical для основных страниц.</li>
+                <li>Реализованы `robots.txt` и `sitemap.xml` для корректной индексации.</li>
+                <li>Улучшена подготовка сайта к поисковому продвижению.</li>
+            </ul>
+        </article>
+
+        <article class="ch-item">
+            <div class="ch-date">17.04.2026</div>
+            <h3>Информирование о запуске</h3>
+            <ul>
+                <li>На главной добавлено всплывающее объявление о тестовом этапе.</li>
+                <li>Доступны действия: закрыть на текущую сессию или скрыть навсегда.</li>
+                <li>Модальное окно адаптировано под мобильный и десктопный интерфейс.</li>
+            </ul>
+        </article>
+    </section>
+
+    <p class="ch-note">Следующие приоритеты: улучшение качества комментариев, персонализация ленты и развитие инструментов автора.</p>
+</div>
+{% endblock %}

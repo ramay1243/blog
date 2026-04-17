@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+
+{% block content %}
+<style>
+.fb-wrap { max-width: 980px; margin: 0 auto; }
+.fb-hero { background: linear-gradient(135deg, #111 0%, #1a0a00 100%); border: 1px solid rgba(255,140,0,.3); border-radius: 18px; padding: 1.4rem; margin-bottom: 1rem; }
+.fb-hero h1 { color: #ffb347; margin-bottom: .45rem; font-size: 1.45rem; }
+.fb-hero p { color: #cfcfcf; line-height: 1.5; font-size: .92rem; }
+.fb-grid { display: grid; grid-template-columns: 1fr 1fr; gap: .9rem; }
+.fb-card { background: #111; border: 1px solid rgba(255,140,0,.18); border-radius: 14px; padding: 1rem; }
+.fb-card h3 { color: #ffd08b; margin-bottom: .35rem; font-size: 1rem; }
+.fb-card p, .fb-card li { color: #d4d4d4; font-size: .9rem; line-height: 1.5; }
+.fb-card ul { margin: .3rem 0 0 1rem; }
+.fb-link { color: #ff9f2e; text-decoration: none; }
+.fb-link:hover { color: #ffc06e; text-decoration: underline; }
+.fb-hint { margin-top: 1rem; border-left: 3px solid #ff8c00; padding-left: .8rem; color: #bdbdbd; font-size: .85rem; }
+@media (max-width: 768px){ .fb-grid { grid-template-columns: 1fr; } .fb-hero h1 { font-size: 1.15rem; } }
+</style>
+
+<div class="fb-wrap">
+    <section class="fb-hero">
+        <h1>Обратная связь и сообщения об ошибках</h1>
+        <p>Мы активно развиваем платформу. Если нашли ошибку, хотите предложить функцию или улучшение интерфейса — обязательно напишите нам.</p>
+    </section>
+
+    <section class="fb-grid">
+        <article class="fb-card">
+            <h3>Как сообщить об ошибке</h3>
+            <ul>
+                <li>Кратко опишите проблему и что вы делали перед ошибкой.</li>
+                <li>Укажите страницу, где это произошло (ссылка).</li>
+                <li>Добавьте скриншот или текст ошибки, если есть.</li>
+                <li>Напишите устройство и браузер (например, Android + Chrome).</li>
+            </ul>
+        </article>
+
+        <article class="fb-card">
+            <h3>Куда писать</h3>
+            <p>Email поддержки: <a class="fb-link" href="mailto:support@scribli.ru">support@scribli.ru</a></p>
+            <p>Telegram: <a class="fb-link" href="#" aria-label="Telegram поддержки">@scribli_support</a></p>
+            <p>Для предложений по продукту укажите тему письма: <strong>[IDEA]</strong></p>
+        </article>
+
+        <article class="fb-card">
+            <h3>Что мы особенно ценим</h3>
+            <p>Конкретные кейсы, понятные шаги воспроизведения и предложения по UX. Это помогает исправлять баги быстрее и улучшать платформу точечно.</p>
+        </article>
+
+        <article class="fb-card">
+            <h3>Сроки ответа</h3>
+            <p>Обычно отвечаем в течение 24–72 часов. Критические проблемы (невозможно читать/публиковать) разбираем в приоритетном порядке.</p>
+        </article>
+    </section>
+
+    <p class="fb-hint">Спасибо за обратную связь. На этапе тестирования ваши сообщения помогают нам улучшать scribli быстрее всего.</p>
+</div>
+{% endblock %}

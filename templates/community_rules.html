@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+
+{% block content %}
+<style>
+.rules-wrap { max-width: 980px; margin: 0 auto; }
+.rules-hero { background: linear-gradient(135deg, #111 0%, #1b0d03 100%); border: 1px solid rgba(255,140,0,.3); border-radius: 18px; padding: 1.4rem; margin-bottom: 1rem; }
+.rules-hero h1 { color: #ffb347; margin-bottom: .45rem; font-size: 1.45rem; }
+.rules-hero p { color: #cfcfcf; line-height: 1.5; font-size: .92rem; }
+.rules-grid { display: grid; gap: .8rem; }
+.rule-card { background: #111; border: 1px solid rgba(255,140,0,.18); border-radius: 14px; padding: 1rem; }
+.rule-card h3 { color: #ffd08b; margin-bottom: .35rem; font-size: 1rem; }
+.rule-card p { color: #d4d4d4; line-height: 1.5; font-size: .9rem; }
+.rules-note { margin-top: 1rem; color: #bdbdbd; font-size: .85rem; border-left: 3px solid #ff8c00; padding-left: .8rem; }
+@media (max-width: 768px){ .rules-hero h1 { font-size: 1.15rem; } }
+</style>
+
+<div class="rules-wrap">
+    <section class="rules-hero">
+        <h1>Правила сообщества scribli</h1>
+        <p>Наша цель — безопасное и полезное пространство для авторов и читателей. Публикуйте с уважением к аудитории и обсуждайте материалы конструктивно.</p>
+    </section>
+
+    <section class="rules-grid">
+        <article class="rule-card">
+            <h3>1) Уважительное общение</h3>
+            <p>Оскорбления, травля, унижение и провокации в комментариях запрещены. Критикуйте идеи, а не личность автора или читателя.</p>
+        </article>
+        <article class="rule-card">
+            <h3>2) Запрет на язык ненависти</h3>
+            <p>Не допускаются материалы и комментарии с дискриминацией по национальности, расе, полу, религии, возрасту или любому другому признаку.</p>
+        </article>
+        <article class="rule-card">
+            <h3>3) Контент должен быть законным</h3>
+            <p>Запрещён призыв к насилию, публикация незаконной информации, мошенничество и любой другой контент, нарушающий законодательство.</p>
+        </article>
+        <article class="rule-card">
+            <h3>4) Авторские права</h3>
+            <p>Публикуйте только собственные материалы либо используйте чужие материалы с разрешением и указанием источника.</p>
+        </article>
+        <article class="rule-card">
+            <h3>5) Без спама и накрутки</h3>
+            <p>Массовые однотипные публикации, агрессивная реклама, манипуляции активностью и накрутка лайков/комментариев запрещены.</p>
+        </article>
+        <article class="rule-card">
+            <h3>6) Ответственность за публикации</h3>
+            <p>Автор несёт ответственность за достоверность фактов и корректность формулировок. При спорных темах добавляйте источники и контекст.</p>
+        </article>
+        <article class="rule-card">
+            <h3>7) Как мы модерируем</h3>
+            <p>Нарушающий контент может быть скрыт или удалён, а аккаунт ограничен. Решение принимается по совокупности факторов и истории нарушений.</p>
+        </article>
+    </section>
+
+    <p class="rules-note">Если вы видите нарушение, отправьте жалобу или напишите в раздел «Обратная связь» с ссылкой и коротким описанием ситуации.</p>
+</div>
+{% endblock %}
