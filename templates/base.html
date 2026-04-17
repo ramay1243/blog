@@ -3,8 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}scribli{% endblock %}</title>
-    <meta name="description" content="{{ meta_description|default('scribli — платформа для историй') }}">
+    <title>{% block title %}scribli — истории, статьи, блоги и видео{% endblock %}</title>
+    <meta name="description" content="{{ meta_description|default('scribli — платформа для историй, статей, блогов и видео. Читайте, смотрите, пишите, комментируйте. Присоединяйтесь к сообществу авторов!') }}">
+    <link rel="icon" type="image/png" href="/static/favicon.png">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
     <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
     <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
@@ -1199,6 +1200,63 @@ body.menu-open {
     }
 }
     </style>
+        <!-- SEO мета-теги -->
+    <link rel="canonical" href="https://scribli.ru/">
+    <meta name="robots" content="index, follow">
+    <meta name="author" content="scribli">
+    <meta name="keywords" content="истории, блог, статьи, рассказы, сообщество авторов, читать истории, scribli, платформа для историй, видео, смотреть видео, видеоблог, видеоконтент, блоги, ведение блога, публикация статей">
+    
+    <!-- Open Graph для соцсетей (уже есть, проверьте) -->
+    <meta property="og:title" content="scribli — истории, статьи, блоги и видео">
+    <meta property="og:description" content="Читайте истории, смотрите видео, пишите статьи и блоги на scribli">
+    <meta property="og:image" content="https://scribli.ru/static/og-image.png">
+
+    <!-- Дополнительно для видео -->
+    <meta property="og:type" content="website">
+    <meta property="og:video" content="https://scribli.ru/static/video-preview.mp4">
+    <meta property="og:video:type" content="video/mp4">
+    <meta property="og:video:width" content="1280">
+    <meta property="og:video:height" content="720">
+    
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="scribli — истории и блоги">
+    <meta name="twitter:description" content="Читайте истории, делитесь мыслями, находите единомышленников">
+    <meta name="twitter:image" content="https://scribli.ru/static/og-image.png">
+    
+    <!-- Schema.org разметка -->
+    <script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "name": "scribli",
+    "url": "https://scribli.ru/",
+    "description": "Платформа для историй, статей, блогов и видео. Читайте, смотрите, пишите, комментируйте.",
+    "potentialAction": {
+        "@type": "SearchAction",
+        "target": "https://scribli.ru/search?q={search_term_string}",
+        "query-input": "required name=search_term_string"
+    },
+    "sameAs": [
+        "https://t.me/scribli",
+        "https://vk.com/scribli"
+    ]
+}
+</script>
+
+<!-- Отдельная разметка для Video (поисковики любят видео) -->
+<script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "VideoGallery",
+    "name": "Видео на scribli",
+    "description": "Видео от авторов сообщества scribli",
+    "url": "https://scribli.ru/videos"
+}
+</script>
+    
+    <!-- Sitemap -->
+    <link rel="sitemap" type="application/xml" title="Sitemap" href="/sitemap.xml">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 </head>
 <body>

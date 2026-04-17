@@ -622,6 +622,10 @@
 
     <!-- Правая часть: статьи -->
     <div class="content-right">
+        <!-- Скрытый H1 для поисковых систем (виден только роботам) -->
+    <h1 style="position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); border: 0;">
+        scribli — истории, статьи, блоги и видео | Платформа для авторов и читателей
+    </h1>
         <div class="section-header">
             {% if feed == 'popular' %}
                 <h2><i class="fas fa-fire"></i> Популярные статьи</h2>
@@ -637,7 +641,7 @@
 
         <div class="articles-grid" id="articlesGrid">
             {% for article in articles %}
-            <div class="article-card">
+            <div class="article-card" itemscope itemtype="https://schema.org/{% if article.video_url %}VideoObject{% else %}Article{% endif %}">
                 <div class="card-header">
                     <div class="author-avatar">
                         {% if article.author_avatar and article.author_avatar != 'default.png' %}
@@ -661,12 +665,12 @@
                     {% if article.category %}
                     <div class="cat-badge">{{ article.category.icon }} {{ article.category.name }}</div>
                     {% endif %}
-                    <h3 class="article-title">
-                        <a href="/article/{{ article.slug }}">{{ article.title }}</a>
+                    <h3 class="article-title" itemprop="headline">
+                      <a href="/article/{{ article.slug }}" itemprop="url">{{ article.title }}</a>
                     </h3>
                     
-                    <div class="article-excerpt">
-                        {{ article.description[:140] }}{% if article.description|length > 140 %}...{% endif %}
+                    <div class="article-excerpt" itemprop="description">
+                      {{ article.description[:140] }}{% if article.description|length > 140 %}...{% endif %}
                     </div>
                     
                     <div class="card-footer">
